@@ -1,0 +1,1103 @@
+@font-face {
+    font-family: 'Britney';
+    src: url('/fonts/Britney-Light.woff2') format('woff2'), url('/fonts/Britney-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Britney';
+    src: url('/fonts/Britney-Regular.woff2') format('woff2'), url('/fonts/Britney-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Britney';
+    src: url('/fonts/Britney-Bold.woff2') format('woff2'), url('/fonts/Britney-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Britney';
+    src: url('/fonts/Britney-Ultra.woff2') format('woff2'), url('/fonts/Britney-Ultra.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Britney';
+    src: url('/fonts/Britney-Variable.woff2') format('woff2'), url('/fonts/Britney-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CabinetGrotesk';
+    src: url('/fonts/CabinetGrotesk-Thin.woff2') format('woff2'), url('/fonts/CabinetGrotesk-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CabinetGrotesk';
+    src: url('/fonts/CabinetGrotesk-Extralight.woff2') format('woff2'), url('/fonts/CabinetGrotesk-Extralight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CabinetGrotesk';
+    src: url('/fonts/CabinetGrotesk-Light.woff2') format('woff2'), url('/fonts/CabinetGrotesk-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CabinetGrotesk';
+    src: url('/fonts/CabinetGrotesk-Regular.woff2') format('woff2'), url('/fonts/CabinetGrotesk-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CabinetGrotesk';
+    src: url('/fonts/CabinetGrotesk-Medium.woff2') format('woff2'), url('/fonts/CabinetGrotesk-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CabinetGrotesk';
+    src: url('/fonts/CabinetGrotesk-Bold.woff2') format('woff2'), url('/fonts/CabinetGrotesk-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CabinetGrotesk';
+    src: url('/fonts/CabinetGrotesk-Extrabold.woff2') format('woff2'), url('/fonts/CabinetGrotesk-Extrabold.woff') format('woff');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CabinetGrotesk';
+    src: url('/fonts/CabinetGrotesk-Black.woff2') format('woff2'), url('/fonts/CabinetGrotesk-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CabinetGrotesk';
+    src: url('/fonts/CabinetGrotesk-Variable.woff2') format('woff2'), url('/fonts/CabinetGrotesk-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Chillax';
+    src: url('/fonts/Chillax-Extralight.woff2') format('woff2'), url('/fonts/Chillax-Extralight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Chillax';
+    src: url('/fonts/Chillax-Light.woff2') format('woff2'), url('/fonts/Chillax-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Chillax';
+    src: url('/fonts/Chillax-Regular.woff2') format('woff2'), url('/fonts/Chillax-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Chillax';
+    src: url('/fonts/Chillax-Medium.woff2') format('woff2'), url('/fonts/Chillax-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Chillax';
+    src: url('/fonts/Chillax-Semibold.woff2') format('woff2'), url('/fonts/Chillax-Semibold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Chillax';
+    src: url('/fonts/Chillax-Bold.woff2') format('woff2'), url('/fonts/Chillax-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Chillax';
+    src: url('/fonts/Chillax-Variable.woff2') format('woff2'), url('/fonts/Chillax-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ClashDisplay';
+    src: url('/fonts/ClashDisplay-Extralight.woff2') format('woff2'), url('/fonts/ClashDisplay-Extralight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ClashDisplay';
+    src: url('/fonts/ClashDisplay-Light.woff2') format('woff2'), url('/fonts/ClashDisplay-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ClashDisplay';
+    src: url('/fonts/ClashDisplay-Regular.woff2') format('woff2'), url('/fonts/ClashDisplay-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ClashDisplay';
+    src: url('/fonts/ClashDisplay-Medium.woff2') format('woff2'), url('/fonts/ClashDisplay-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ClashDisplay';
+    src: url('/fonts/ClashDisplay-Semibold.woff2') format('woff2'), url('/fonts/ClashDisplay-Semibold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ClashDisplay';
+    src: url('/fonts/ClashDisplay-Bold.woff2') format('woff2'), url('/fonts/ClashDisplay-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ClashDisplay';
+    src: url('/fonts/ClashDisplay-Variable.woff2') format('woff2'), url('/fonts/ClashDisplay-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Melodrama';
+    src: url('/fonts/Melodrama-Light.woff2') format('woff2'), url('/fonts/Melodrama-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Melodrama';
+    src: url('/fonts/Melodrama-Regular.woff2') format('woff2'), url('/fonts/Melodrama-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Melodrama';
+    src: url('/fonts/Melodrama-Medium.woff2') format('woff2'), url('/fonts/Melodrama-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Melodrama';
+    src: url('/fonts/Melodrama-Semibold.woff2') format('woff2'), url('/fonts/Melodrama-Semibold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Melodrama';
+    src: url('/fonts/Melodrama-Bold.woff2') format('woff2'), url('/fonts/Melodrama-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Melodrama';
+    src: url('/fonts/Melodrama-Variable.woff2') format('woff2'), url('/fonts/Melodrama-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nippo';
+    src: url('/fonts/Nippo-Extralight.woff2') format('woff2'), url('/fonts/Nippo-Extralight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nippo';
+    src: url('/fonts/Nippo-Light.woff2') format('woff2'), url('/fonts/Nippo-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nippo';
+    src: url('/fonts/Nippo-Regular.woff2') format('woff2'), url('/fonts/Nippo-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nippo';
+    src: url('/fonts/Nippo-Medium.woff2') format('woff2'), url('/fonts/Nippo-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nippo';
+    src: url('/fonts/Nippo-Bold.woff2') format('woff2'), url('/fonts/Nippo-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nippo';
+    src: url('/fonts/Nippo-Variable.woff2') format('woff2'), url('/fonts/Nippo-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit-Thin.woff2') format('woff2'), url('/fonts/Outfit-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit-ExtraLight.woff2') format('woff2'), url('/fonts/Outfit-ExtraLight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit-Light.woff2') format('woff2'), url('/fonts/Outfit-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit-Regular.woff2') format('woff2'), url('/fonts/Outfit-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit-Medium.woff2') format('woff2'), url('/fonts/Outfit-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit-SemiBold.woff2') format('woff2'), url('/fonts/Outfit-SemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit-Bold.woff2') format('woff2'), url('/fonts/Outfit-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit-ExtraBold.woff2') format('woff2'), url('/fonts/Outfit-ExtraBold.woff') format('woff');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit-Black.woff2') format('woff2'), url('/fonts/Outfit-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit-Variable.woff2') format('woff2'), url('/fonts/Outfit-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Panchang';
+    src: url('/fonts/Panchang-Extralight.woff2') format('woff2'), url('/fonts/Panchang-Extralight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Panchang';
+    src: url('/fonts/Panchang-Light.woff2') format('woff2'), url('/fonts/Panchang-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Panchang';
+    src: url('/fonts/Panchang-Regular.woff2') format('woff2'), url('/fonts/Panchang-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Panchang';
+    src: url('/fonts/Panchang-Medium.woff2') format('woff2'), url('/fonts/Panchang-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Panchang';
+    src: url('/fonts/Panchang-Semibold.woff2') format('woff2'), url('/fonts/Panchang-Semibold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Panchang';
+    src: url('/fonts/Panchang-Bold.woff2') format('woff2'), url('/fonts/Panchang-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Panchang';
+    src: url('/fonts/Panchang-Extrabold.woff2') format('woff2'), url('/fonts/Panchang-Extrabold.woff') format('woff');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Panchang';
+    src: url('/fonts/Panchang-Variable.woff2') format('woff2'), url('/fonts/Panchang-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-Thin.woff2') format('woff2'), url('/fonts/Poppins-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-ThinItalic.woff2') format('woff2'), url('/fonts/Poppins-ThinItalic.woff') format('woff');
+    font-weight: 100;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-ExtraLight.woff2') format('woff2'), url('/fonts/Poppins-ExtraLight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-ExtraLightItalic.woff2') format('woff2'), url('/fonts/Poppins-ExtraLightItalic.woff') format('woff');
+    font-weight: 200;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-Light.woff2') format('woff2'), url('/fonts/Poppins-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-LightItalic.woff2') format('woff2'), url('/fonts/Poppins-LightItalic.woff') format('woff');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-Regular.woff2') format('woff2'), url('/fonts/Poppins-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-Italic.woff2') format('woff2'), url('/fonts/Poppins-Italic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-Medium.woff2') format('woff2'), url('/fonts/Poppins-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-MediumItalic.woff2') format('woff2'), url('/fonts/Poppins-MediumItalic.woff') format('woff');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-SemiBold.woff2') format('woff2'), url('/fonts/Poppins-SemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-SemiBoldItalic.woff2') format('woff2'), url('/fonts/Poppins-SemiBoldItalic.woff') format('woff');
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-Bold.woff2') format('woff2'), url('/fonts/Poppins-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-BoldItalic.woff2') format('woff2'), url('/fonts/Poppins-BoldItalic.woff') format('woff');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-ExtraBold.woff2') format('woff2'), url('/fonts/Poppins-ExtraBold.woff') format('woff');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-ExtraBoldItalic.woff2') format('woff2'), url('/fonts/Poppins-ExtraBoldItalic.woff') format('woff');
+    font-weight: 800;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-Black.woff2') format('woff2'), url('/fonts/Poppins-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-BlackItalic.woff2') format('woff2'), url('/fonts/Poppins-BlackItalic.woff') format('woff');
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-Variable.woff2') format('woff2'), url('/fonts/Poppins-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-VariableItalic.woff2') format('woff2'), url('/fonts/Poppins-VariableItalic.woff') format('woff');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-Light.woff2') format('woff2'), url('/fonts/Satoshi-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-LightItalic.woff2') format('woff2'), url('/fonts/Satoshi-LightItalic.woff') format('woff');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-Regular.woff2') format('woff2'), url('/fonts/Satoshi-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-Italic.woff2') format('woff2'), url('/fonts/Satoshi-Italic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-Medium.woff2') format('woff2'), url('/fonts/Satoshi-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-MediumItalic.woff2') format('woff2'), url('/fonts/Satoshi-MediumItalic.woff') format('woff');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-Bold.woff2') format('woff2'), url('/fonts/Satoshi-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-BoldItalic.woff2') format('woff2'), url('/fonts/Satoshi-BoldItalic.woff') format('woff');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-Black.woff2') format('woff2'), url('/fonts/Satoshi-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-BlackItalic.woff2') format('woff2'), url('/fonts/Satoshi-BlackItalic.woff') format('woff');
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-Variable.woff2') format('woff2'), url('/fonts/Satoshi-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-VariableItalic.woff2') format('woff2'), url('/fonts/Satoshi-VariableItalic.woff') format('woff');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-Extralight.woff2') format('woff2'), url('/fonts/Sentient-Extralight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-ExtralightItalic.woff2') format('woff2'), url('/fonts/Sentient-ExtralightItalic.woff') format('woff');
+    font-weight: 200;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-Light.woff2') format('woff2'), url('/fonts/Sentient-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-LightItalic.woff2') format('woff2'), url('/fonts/Sentient-LightItalic.woff') format('woff');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-Regular.woff2') format('woff2'), url('/fonts/Sentient-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-Italic.woff2') format('woff2'), url('/fonts/Sentient-Italic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-Medium.woff2') format('woff2'), url('/fonts/Sentient-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-MediumItalic.woff2') format('woff2'), url('/fonts/Sentient-MediumItalic.woff') format('woff');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-Bold.woff2') format('woff2'), url('/fonts/Sentient-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-BoldItalic.woff2') format('woff2'), url('/fonts/Sentient-BoldItalic.woff') format('woff');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-Variable.woff2') format('woff2'), url('/fonts/Sentient-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sentient';
+    src: url('/fonts/Sentient-VariableItalic.woff2') format('woff2'), url('/fonts/Sentient-VariableItalic.woff') format('woff');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-Thin.woff2') format('woff2'), url('/fonts/Supreme-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-ThinItalic.woff2') format('woff2'), url('/fonts/Supreme-ThinItalic.woff') format('woff');
+    font-weight: 100;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-Extralight.woff2') format('woff2'), url('/fonts/Supreme-Extralight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-ExtralightItalic.woff2') format('woff2'), url('/fonts/Supreme-ExtralightItalic.woff') format('woff');
+    font-weight: 200;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-Light.woff2') format('woff2'), url('/fonts/Supreme-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-LightItalic.woff2') format('woff2'), url('/fonts/Supreme-LightItalic.woff') format('woff');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-Regular.woff2') format('woff2'), url('/fonts/Supreme-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-Italic.woff2') format('woff2'), url('/fonts/Supreme-Italic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-Medium.woff2') format('woff2'), url('/fonts/Supreme-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-MediumItalic.woff2') format('woff2'), url('/fonts/Supreme-MediumItalic.woff') format('woff');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-Bold.woff2') format('woff2'), url('/fonts/Supreme-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-BoldItalic.woff2') format('woff2'), url('/fonts/Supreme-BoldItalic.woff') format('woff');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-Extrabold.woff2') format('woff2'), url('/fonts/Supreme-Extrabold.woff') format('woff');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-ExtraboldItalic.woff2') format('woff2'), url('/fonts/Supreme-ExtraboldItalic.woff') format('woff');
+    font-weight: 800;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-Variable.woff2') format('woff2'), url('/fonts/Supreme-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Supreme';
+    src: url('/fonts/Supreme-VariableItalic.woff2') format('woff2'), url('/fonts/Supreme-VariableItalic.woff') format('woff');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Technor';
+    src: url('/fonts/Technor-Extralight.woff2') format('woff2'), url('/fonts/Technor-Extralight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Technor';
+    src: url('/fonts/Technor-Light.woff2') format('woff2'), url('/fonts/Technor-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Technor';
+    src: url('/fonts/Technor-Regular.woff2') format('woff2'), url('/fonts/Technor-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Technor';
+    src: url('/fonts/Technor-Medium.woff2') format('woff2'), url('/fonts/Technor-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Technor';
+    src: url('/fonts/Technor-Semibold.woff2') format('woff2'), url('/fonts/Technor-Semibold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Technor';
+    src: url('/fonts/Technor-Bold.woff2') format('woff2'), url('/fonts/Technor-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Technor';
+    src: url('/fonts/Technor-Black.woff2') format('woff2'), url('/fonts/Technor-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Technor';
+    src: url('/fonts/Technor-Variable.woff2') format('woff2'), url('/fonts/Technor-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Teko';
+    src: url('/fonts/Teko-Light.woff2') format('woff2'), url('/fonts/Teko-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Teko';
+    src: url('/fonts/Teko-Regular.woff2') format('woff2'), url('/fonts/Teko-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Teko';
+    src: url('/fonts/Teko-Medium.woff2') format('woff2'), url('/fonts/Teko-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Teko';
+    src: url('/fonts/Teko-SemiBold.woff2') format('woff2'), url('/fonts/Teko-SemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Teko';
+    src: url('/fonts/Teko-Bold.woff2') format('woff2'), url('/fonts/Teko-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Teko';
+    src: url('/fonts/Teko-Variable.woff2') format('woff2'), url('/fonts/Teko-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Telma';
+    src: url('/fonts/Telma-Light.woff2') format('woff2'), url('/fonts/Telma-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Telma';
+    src: url('/fonts/Telma-Regular.woff2') format('woff2'), url('/fonts/Telma-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Telma';
+    src: url('/fonts/Telma-Medium.woff2') format('woff2'), url('/fonts/Telma-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Telma';
+    src: url('/fonts/Telma-Bold.woff2') format('woff2'), url('/fonts/Telma-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Telma';
+    src: url('/fonts/Telma-Black.woff2') format('woff2'), url('/fonts/Telma-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Telma';
+    src: url('/fonts/Telma-Variable.woff2') format('woff2'), url('/fonts/Telma-Variable.woff') format('woff');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
