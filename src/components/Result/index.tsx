@@ -30,7 +30,16 @@ type ResultProps = {
     onMediaTypeChange?: (type: MediaTypeFilter) => void
 }
 
-const MEDIA_TYPES = ['all', 'audio', 'movies', 'software', 'texts', 'image', 'data'] as const
+const MEDIA_TYPES = [
+    'all',
+    'audio',
+    'movies',
+    'software',
+    'texts',
+    'image',
+    'data',
+    'collection',
+] as const
 type MediaTypeFilter = (typeof MEDIA_TYPES)[number]
 
 const MEDIA_TYPE_LABELS: Record<MediaTypeFilter, string> = {
@@ -41,6 +50,7 @@ const MEDIA_TYPE_LABELS: Record<MediaTypeFilter, string> = {
     texts: 'Texts',
     image: 'Images',
     data: 'Data',
+    collection: 'Collections',
 }
 
 export default function Result({
@@ -58,14 +68,19 @@ export default function Result({
     const currentPage = typeof pageProp === 'number' ? pageProp : internalPage
     const pageSize = pageSizeProp
 
-    const items = React.useMemo(
-        () =>
-            data.filter(
-                (item): item is ArchiveDoc & { identifier: string } =>
-                    typeof item?.identifier === 'string' && item.identifier.length > 0
-            ),
-        [data]
-    )
+    const items = React.useMemo(() => {
+        const withIds = data.filter(
+            (item): item is ArchiveDoc & { identifier: string } =>
+                typeof item?.identifier === 'string' && item.identifier.length > 0
+        )
+
+        // Safety net: even if the server returns mixed docs,
+        // the UI stays consistent with the selected filter.
+        if (mediaType === 'all') return withIds
+        return withIds.filter(
+            (item) => String(item.mediatype).toLowerCase() === mediaType
+        )
+    }, [data, mediaType])
     const isServerPagination = typeof totalItemsProp === 'number'
     const totalItems = isServerPagination ? totalItemsProp : items.length
     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
@@ -108,9 +123,11 @@ export default function Result({
     }, [safePage, totalPages])
 
     const pagination = totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-            <p className="text-sm text-muted-foreground">{rangeLabel}</p>
-            <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+            <p className="text-sm text-muted-foreground text-center sm:text-left">
+                {rangeLabel}
+            </p>
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
                 <Button
                     variant="outline"
                     size="sm"
@@ -151,23 +168,44 @@ export default function Result({
             </h1>
 
             <div className="flex flex-col items-center gap-3">
-                <Tabs
-                    value={mediaType}
-                    onValueChange={(v) => {
-                        const next = (MEDIA_TYPES as readonly string[]).includes(v)
-                            ? (v as MediaTypeFilter)
-                            : 'all'
-                        onMediaTypeChange?.(next)
-                    }}
-                >
-                    <TabsList className="w-full max-w-xl flex flex-wrap h-auto">
+                {/* Mobile: use a dropdown so it doesn't overflow */}
+                <div className="w-full max-w-xs sm:hidden">
+                    <select
+                        value={mediaType}
+                        onChange={(e) =>
+                            onMediaTypeChange?.(e.currentTarget.value as MediaTypeFilter)
+                        }
+                        className="w-full h-10 rounded-md border bg-background px-3 text-sm"
+                        aria-label="Filter by type"
+                    >
                         {MEDIA_TYPES.map((t) => (
-                            <TabsTrigger key={t} value={t} className="flex-1">
+                            <option key={t} value={t}>
                                 {MEDIA_TYPE_LABELS[t]}
-                            </TabsTrigger>
+                            </option>
                         ))}
-                    </TabsList>
-                </Tabs>
+                    </select>
+                </div>
+
+                {/* Desktop/tablet: tabs */}
+                <div className="hidden sm:block w-full max-w-xl">
+                    <Tabs
+                        value={mediaType}
+                        onValueChange={(v) => {
+                            const next = (MEDIA_TYPES as readonly string[]).includes(v)
+                                ? (v as MediaTypeFilter)
+                                : 'all'
+                            onMediaTypeChange?.(next)
+                        }}
+                    >
+                        <TabsList className="w-full overflow-x-auto flex-nowrap">
+                            {MEDIA_TYPES.map((t) => (
+                                <TabsTrigger key={t} value={t} className="flex-1">
+                                    {MEDIA_TYPE_LABELS[t]}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                    </Tabs>
+                </div>
             </div>
 
             {totalItems === 0 && (

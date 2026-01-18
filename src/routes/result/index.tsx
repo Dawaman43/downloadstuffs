@@ -7,7 +7,16 @@ import { Card, CardHeader } from '@/components/ui/card'
 
 const PAGE_SIZE = 10
 
-const MEDIA_TYPES = ['all', 'audio', 'movies', 'software', 'texts', 'image', 'data'] as const
+const MEDIA_TYPES = [
+    'all',
+    'audio',
+    'movies',
+    'software',
+    'texts',
+    'image',
+    'data',
+    'collection',
+] as const
 type MediaTypeFilter = (typeof MEDIA_TYPES)[number]
 
 export const Route = createFileRoute('/result/')({
@@ -44,10 +53,11 @@ export const Route = createFileRoute('/result/')({
         const q = deps.q.trim()
         if (!q) return { docs: [], total: 0 }
 
+        const baseQuery = `(${q})`
         const query =
             deps.type && deps.type !== 'all'
-                ? `${q} AND mediatype:${deps.type}`
-                : q
+                ? `${baseQuery} AND mediatype:${deps.type}`
+                : baseQuery
         return await searchIA({
             data: { query, page: deps.page ?? 1, rows: PAGE_SIZE },
         })
@@ -97,6 +107,12 @@ function RouteComponent() {
     // Keep URL in sync when page is out of range (e.g. new search results)
     // or when query changes (reset to page 1).
     const prevQRef = React.useRef(search.q)
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }, [page, search.type])
+
     React.useEffect(() => {
         if (prevQRef.current !== search.q) {
             prevQRef.current = search.q
