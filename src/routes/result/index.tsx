@@ -1,6 +1,11 @@
 import Result from '@/components/Result'
 import { searchIA } from '@/data/fetchapi'
 import { createFileRoute } from '@tanstack/react-router'
+import * as React from 'react'
+
+import { Card, CardHeader } from '@/components/ui/card'
+
+const PAGE_SIZE = 10
 
 export const Route = createFileRoute('/result/')({
     validateSearch: (search: unknown) => ({
@@ -8,21 +13,106 @@ export const Route = createFileRoute('/result/')({
             typeof (search as any)?.q === 'string'
                 ? ((search as any).q as string)
                 : '',
+        page: (() => {
+            const raw = (search as any)?.page
+            const n =
+                typeof raw === 'number'
+                    ? raw
+                    : typeof raw === 'string'
+                      ? Number.parseInt(raw, 10)
+                      : 1
+            return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1
+        })(),
     }),
     loaderDeps: ({ search }) => ({
         q: search.q,
+        page: search.page,
     }),
     loader: async ({ deps }) => {
         const q = deps.q.trim()
-        if (!q) return []
-        return await searchIA({ data: { query: q } })
+        if (!q) return { docs: [], total: 0 }
+        return await searchIA({
+            data: { query: q, page: deps.page ?? 1, rows: PAGE_SIZE },
+        })
     },
+    pendingComponent: ResultPending,
     component: RouteComponent,
 })
 
+function ResultPending() {
+    // Simple skeleton state while the loader is fetching
+    return (
+        <div className="w-full max-w-5xl flex flex-col gap-6 py-8">
+            <div className="flex flex-col items-center gap-2">
+                <h1 className="font-clash text-4xl font-semibold text-center">
+                    Search Results
+                </h1>
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                    <span className="inline-block h-4 w-4 rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground animate-spin" />
+                    <span>Loading…</span>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                    <Card key={i} className="overflow-hidden">
+                        <div className="h-44 w-full bg-muted animate-pulse" />
+                        <CardHeader className="space-y-3">
+                            <div className="h-4 w-4/5 bg-muted animate-pulse rounded" />
+                            <div className="h-3 w-2/3 bg-muted animate-pulse rounded" />
+                            <div className="h-3 w-1/2 bg-muted animate-pulse rounded" />
+                        </CardHeader>
+                    </Card>
+                ))}
+            </div>
+        </div>
+    )
+}
+
 function RouteComponent() {
     const data = Route.useLoaderData()
-    return <Result data={data} />
+    const search = Route.useSearch()
+    const navigate = Route.useNavigate()
+
+    const totalPages = Math.max(1, Math.ceil(data.total / PAGE_SIZE))
+    const page = Math.min(Math.max(1, search.page ?? 1), totalPages)
+
+    // Keep URL in sync when page is out of range (e.g. new search results)
+    // or when query changes (reset to page 1).
+    const prevQRef = React.useRef(search.q)
+    React.useEffect(() => {
+        if (prevQRef.current !== search.q) {
+            prevQRef.current = search.q
+            if ((search.page ?? 1) !== 1) {
+                navigate({
+                    search: (prev) => ({ ...prev, page: 1 }),
+                    replace: true,
+                })
+            }
+            return
+        }
+
+        if ((search.page ?? 1) !== page) {
+            navigate({
+                search: (prev) => ({ ...prev, page }),
+                replace: true,
+            })
+        }
+    }, [navigate, page, search.page, search.q])
+
+    return (
+        <Result
+            data={data.docs}
+            totalItems={data.total}
+            page={page}
+            pageSize={PAGE_SIZE}
+            onPageChange={(nextPage) =>
+                navigate({
+                    search: (prev) => ({ ...prev, page: nextPage }),
+                })
+            }
+        />
+    )
 }
 
 

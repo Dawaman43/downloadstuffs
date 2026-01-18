@@ -22,10 +22,15 @@ export const searchIA = createServerFn({ method: "GET" })
     )}&fl[]=identifier&fl[]=title&fl[]=creator&fl[]=mediatype&fl[]=date&fl[]=year&fl[]=description&fl[]=downloads&fl[]=subject&fl[]=collection&rows=${rows}&start=${start}&output=json`;
 
     const res = await fetch(url);
-    if (!res.ok) return [];
+    if (!res.ok) return { docs: [], total: 0 };
     const result = await res.json().catch(() => null);
-    if (!result?.response?.docs) return [];
-    return result.response.docs;
+    const docs = result?.response?.docs ?? [];
+    const total =
+      typeof result?.response?.numFound === 'number'
+        ? result.response.numFound
+        : docs.length;
+
+    return { docs, total };
   });
 
 export const getArchiveItem = createServerFn({ method: "GET" })

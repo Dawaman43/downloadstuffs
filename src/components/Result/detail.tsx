@@ -56,7 +56,41 @@ export default function ResultDetails() {
         });
     }, [id, fetchItem]);
 
-    if (loading) return <p>Loading details...</p>;
+    if (loading)
+        return (
+            <div className="max-w-3xl mx-auto py-10 space-y-6">
+                <div className="flex flex-col items-center gap-2">
+                    <div className="text-sm text-muted-foreground flex items-center gap-2">
+                        <span className="inline-block h-4 w-4 rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground animate-spin" />
+                        <span>Loading details…</span>
+                    </div>
+                </div>
+
+                <Card>
+                    <CardHeader className="space-y-3">
+                        <div className="h-6 w-3/4 bg-muted animate-pulse rounded" />
+                        <div className="h-4 w-1/3 bg-muted animate-pulse rounded" />
+                        <div className="h-3 w-1/2 bg-muted animate-pulse rounded" />
+                    </CardHeader>
+                </Card>
+
+                <Card>
+                    <CardHeader className="space-y-4">
+                        <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                        <div className="h-72 w-full bg-muted animate-pulse rounded-md" />
+                    </CardHeader>
+                </Card>
+
+                <Card>
+                    <CardHeader className="space-y-3">
+                        <div className="h-4 w-28 bg-muted animate-pulse rounded" />
+                        <div className="h-3 w-full bg-muted animate-pulse rounded" />
+                        <div className="h-3 w-11/12 bg-muted animate-pulse rounded" />
+                        <div className="h-3 w-10/12 bg-muted animate-pulse rounded" />
+                    </CardHeader>
+                </Card>
+            </div>
+        );
     if (!item?.metadata) return <p>Could not load item.</p>;
 
     const metadata = item.metadata as Record<string, any>;

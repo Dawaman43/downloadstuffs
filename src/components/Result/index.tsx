@@ -1,42 +1,147 @@
-import { ArchiveDoc } from "@/types/archive";
+import * as React from 'react'
+import { ArchiveDoc } from '@/types/archive'
 import {
     Card,
     CardDescription,
     CardHeader,
     CardTitle,
     CardFooter,
-} from "../ui/card";
-import { Button } from "../ui/button";
-import { Link } from "@tanstack/react-router";
+} from '../ui/card'
+import { Button } from '../ui/button'
+import { Link } from '@tanstack/react-router'
 
 function stripHtml(input: string) {
-    return input.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    return input.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
 function asArray(value?: string | string[]) {
-    if (!value) return [];
-    return Array.isArray(value) ? value : [value];
+    if (!value) return []
+    return Array.isArray(value) ? value : [value]
 }
 
 type ResultProps = {
     data?: ArchiveDoc[];
-};
+    totalItems?: number;
+    page?: number;
+    pageSize?: number;
+    onPageChange?: (page: number) => void;
+}
 
-export default function Result({ data = [] }: ResultProps) {
+export default function Result({
+    data = [],
+    totalItems: totalItemsProp,
+    page: pageProp,
+    pageSize: pageSizeProp = 12,
+    onPageChange,
+}: ResultProps) {
+    const [internalPage, setInternalPage] = React.useState(1)
+
+    const isControlled = typeof onPageChange === 'function'
+    const currentPage = typeof pageProp === 'number' ? pageProp : internalPage
+    const pageSize = pageSizeProp
+
+    const items = React.useMemo(
+        () =>
+            data.filter(
+                (item): item is ArchiveDoc & { identifier: string } =>
+                    typeof item?.identifier === 'string' && item.identifier.length > 0
+            ),
+        [data]
+    )
+    const isServerPagination = typeof totalItemsProp === 'number'
+    const totalItems = isServerPagination ? totalItemsProp : items.length
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
+    const safePage = Math.min(Math.max(1, currentPage), totalPages)
+
+    React.useEffect(() => {
+        if (!isControlled && safePage !== internalPage) setInternalPage(safePage)
+    }, [internalPage, isControlled, safePage])
+
+    const requestPage = React.useCallback(
+        (nextPage: number) => {
+            const clamped = Math.min(Math.max(1, nextPage), totalPages)
+            if (isControlled) onPageChange?.(clamped)
+            else setInternalPage(clamped)
+        },
+        [isControlled, onPageChange, totalPages]
+    )
+
+    const pageItems = React.useMemo(() => {
+        if (isServerPagination) return items
+        const start = (safePage - 1) * pageSize
+        return items.slice(start, start + pageSize)
+    }, [isServerPagination, items, pageSize, safePage])
+
+    const rangeLabel = React.useMemo(() => {
+        if (totalItems === 0) return ''
+        const start = (safePage - 1) * pageSize + 1
+        const end = Math.min(totalItems, start + pageItems.length - 1)
+        return `Showing ${start}–${end} of ${totalItems}`
+    }, [pageItems.length, pageSize, safePage, totalItems])
+
+    const pageNumbers = React.useMemo(() => {
+        const windowSize = 5
+        let start = Math.max(1, safePage - Math.floor(windowSize / 2))
+        let end = Math.min(totalPages, start + windowSize - 1)
+        start = Math.max(1, end - windowSize + 1)
+        const nums: number[] = []
+        for (let p = start; p <= end; p++) nums.push(p)
+        return nums
+    }, [safePage, totalPages])
+
+    const pagination = totalItems > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+            <p className="text-sm text-muted-foreground">{rangeLabel}</p>
+            <div className="flex items-center gap-2">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={safePage <= 1}
+                    onClick={() => requestPage(safePage - 1)}
+                >
+                    Previous
+                </Button>
+
+                {pageNumbers.map((p) => (
+                    <Button
+                        key={p}
+                        variant={p === safePage ? 'default' : 'outline'}
+                        size="sm"
+                        aria-current={p === safePage ? 'page' : undefined}
+                        onClick={() => requestPage(p)}
+                    >
+                        {p}
+                    </Button>
+                ))}
+
+                <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={safePage >= totalPages}
+                    onClick={() => requestPage(safePage + 1)}
+                >
+                    Next
+                </Button>
+            </div>
+        </div>
+    )
+
     return (
         <div className="w-full max-w-5xl flex flex-col gap-6 py-8">
             <h1 className="font-clash text-4xl font-semibold text-center">
                 Search Results
             </h1>
 
-            {data.length === 0 && (
+            {totalItems === 0 && (
                 <p className="text-center text-muted-foreground">
                     No results found. Try another search
                 </p>
             )}
 
+            {pagination}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {data.map((item) =>
+                {pageItems.map((item) =>
                     item?.identifier ? (
                         <Card
                             key={item.identifier}
@@ -91,6 +196,8 @@ export default function Result({ data = [] }: ResultProps) {
                     ) : null
                 )}
             </div>
+
+            {pagination}
         </div>
-    );
+    )
 }
