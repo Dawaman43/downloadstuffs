@@ -1,14 +1,18 @@
 import * as React from 'react'
 import {
+  Info,
+  ListOrdered,
   Maximize,
   Minimize,
   Pause,
+  PictureInPicture2,
   Play,
+  Settings,
+  SkipBack,
+  SkipForward,
   Volume2,
   VolumeX,
-  PictureInPicture2,
-  Settings,
-  Info,
+  X,
 } from 'lucide-react'
 
 function clamp(n: number, min: number, max: number) {
@@ -30,11 +34,22 @@ type VideoPlayerProps = {
   poster?: string
   title?: string
   className?: string
+  queue?: Array<{ src: string; label: string }>
+  activeIndex?: number
+  onActiveIndexChange?: (nextIndex: number) => void
 }
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2] as const
 
-export default function VideoPlayer({ src, poster, title, className }: VideoPlayerProps) {
+export default function VideoPlayer({
+  src,
+  poster,
+  title,
+  className,
+  queue,
+  activeIndex,
+  onActiveIndexChange,
+}: VideoPlayerProps) {
   const containerRef = React.useRef<HTMLDivElement | null>(null)
   const videoRef = React.useRef<HTMLVideoElement | null>(null)
 
@@ -47,12 +62,17 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
   const [playbackRate, setPlaybackRate] = React.useState(1)
   const [showControls, setShowControls] = React.useState(true)
   const [showHelp, setShowHelp] = React.useState(false)
+  const [showQueue, setShowQueue] = React.useState(false)
   const hideTimerRef = React.useRef<number | null>(null)
 
-  const isFullscreen =
-    typeof document !== 'undefined' &&
-    !!document.fullscreenElement &&
-    document.fullscreenElement === containerRef.current
+  const shouldAutoPlayRef = React.useRef(false)
+
+  const hasPlaylist = Array.isArray(queue) && queue.length > 1 && typeof activeIndex === 'number' && typeof onActiveIndexChange === 'function'
+
+  const isFullscreen = document.fullscreenElement === containerRef.current
+
+  const playlistIndex = typeof activeIndex === 'number' ? activeIndex : 0
+  const playlistLength = Array.isArray(queue) ? queue.length : 0
 
   const scheduleHide = React.useCallback(() => {
     if (hideTimerRef.current) window.clearTimeout(hideTimerRef.current)
@@ -64,6 +84,36 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
       setShowControls(false)
     }, 1800)
   }, [isPlaying])
+
+  const goToIndex = React.useCallback(
+    (nextIndex: number, opts?: { autoplay?: boolean }) => {
+      if (!hasPlaylist) return
+      const q = queue
+      const onChange = onActiveIndexChange
+      const clamped = clamp(nextIndex, 0, q.length - 1)
+      shouldAutoPlayRef.current = !!opts?.autoplay
+      onChange(clamped)
+      setShowControls(true)
+      scheduleHide()
+    },
+    [hasPlaylist, onActiveIndexChange, queue, scheduleHide],
+  )
+
+  const goPrev = React.useCallback(
+    () => {
+      if (!hasPlaylist || typeof activeIndex !== 'number') return
+      goToIndex(activeIndex - 1, { autoplay: isPlaying })
+    },
+    [activeIndex, goToIndex, hasPlaylist, isPlaying],
+  )
+
+  const goNext = React.useCallback(
+    () => {
+      if (!hasPlaylist || typeof activeIndex !== 'number') return
+      goToIndex(activeIndex + 1, { autoplay: isPlaying })
+    },
+    [activeIndex, goToIndex, hasPlaylist, isPlaying],
+  )
 
   const syncBuffered = React.useCallback(() => {
     const video = videoRef.current
@@ -148,8 +198,7 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
 
     try {
       if (document.pictureInPictureElement) {
-        // @ts-expect-error - not in older lib types
-        await document.exitPictureInPicture()
+        await (document as any).exitPictureInPicture()
         return
       }
       if (typeof video.requestPictureInPicture === 'function') {
@@ -171,8 +220,9 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
   const onKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
       // Don't steal keys while user is interacting with inputs
-      const tag = (e.target as HTMLElement | null)?.tagName?.toLowerCase()
-      if (tag === 'input' || tag === 'textarea' || (e.target as HTMLElement | null)?.isContentEditable) {
+      const target = e.target as HTMLElement | null
+      const tag = target?.tagName.toLowerCase()
+      if (tag === 'input' || tag === 'textarea' || target?.isContentEditable) {
         return
       }
 
@@ -234,6 +284,30 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
         return
       }
 
+      // prev/next (playlist)
+      if (key.toLowerCase() === 'n') {
+        if (hasPlaylist) {
+          e.preventDefault()
+          goNext()
+        }
+        return
+      }
+      if (key.toLowerCase() === 'b') {
+        if (hasPlaylist) {
+          e.preventDefault()
+          goPrev()
+        }
+        return
+      }
+      if (key.toLowerCase() === 'q') {
+        if (hasPlaylist) {
+          e.preventDefault()
+          setShowQueue((v) => !v)
+          setShowControls(true)
+        }
+        return
+      }
+
       // pip
       if (key.toLowerCase() === 'p') {
         e.preventDefault()
@@ -264,8 +338,54 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
         setPercent(digit * 10)
       }
     },
-    [changeSpeed, playbackRate, seekBy, setPercent, setVideoVolume, showHelp, toggleFullscreen, toggleMute, togglePiP, togglePlay, volume],
+    [
+      changeSpeed,
+      goNext,
+      goPrev,
+      hasPlaylist,
+      playbackRate,
+      scheduleHide,
+      seekBy,
+      setPercent,
+      setVideoVolume,
+      showHelp,
+      toggleFullscreen,
+      toggleMute,
+      togglePiP,
+      togglePlay,
+      volume,
+    ],
   )
+
+  React.useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    const onEnded = () => {
+      if (!hasPlaylist) return
+      const next = playlistIndex + 1
+      if (next >= playlistLength) return
+      shouldAutoPlayRef.current = true
+      onActiveIndexChange(next)
+    }
+
+    video.addEventListener('ended', onEnded)
+    return () => video.removeEventListener('ended', onEnded)
+  }, [activeIndex, hasPlaylist, onActiveIndexChange, queue])
+
+  React.useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (!shouldAutoPlayRef.current) return
+    shouldAutoPlayRef.current = false
+
+    const onCanPlay = () => {
+      video.play().catch(() => {})
+    }
+    video.addEventListener('canplay', onCanPlay, { once: true })
+    return () => video.removeEventListener('canplay', onCanPlay)
+  }, [src])
 
   React.useEffect(() => {
     const video = videoRef.current
@@ -309,6 +429,10 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
   const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0
   const bufferedPct = duration > 0 ? (bufferedEnd / duration) * 100 : 0
 
+  const rootClassName =
+    'group relative w-full overflow-hidden rounded-2xl border bg-black/90 shadow-2xl shadow-black/10 outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
+    (className ? className : '')
+
   return (
     <div
       ref={containerRef}
@@ -322,10 +446,7 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
         if (isPlaying) setShowControls(false)
       }}
       onDoubleClick={() => toggleFullscreen()}
-      className={
-        className ??
-        'group relative w-full overflow-hidden rounded-2xl border bg-black/90 shadow-2xl shadow-black/10 outline-none focus-visible:ring-2 focus-visible:ring-ring'
-      }
+      className={rootClassName}
       aria-label={title ?? 'Video player'}
     >
       <video
@@ -363,7 +484,7 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
       {/* Controls */}
       <div
         className={
-          'absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-3 transition-opacity ' +
+          'absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-black/70 via-black/30 to-transparent p-3 transition-opacity ' +
           (showControls ? 'opacity-100' : 'opacity-0')
         }
       >
@@ -399,6 +520,28 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
 
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
+            {hasPlaylist && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => goPrev()}
+                  disabled={playlistIndex <= 0}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-white/10 text-white hover:bg-white/20 disabled:opacity-50"
+                  aria-label="Previous in playlist"
+                >
+                  <SkipBack className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => goNext()}
+                  disabled={playlistIndex >= playlistLength - 1}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-white/10 text-white hover:bg-white/20 disabled:opacity-50"
+                  aria-label="Next in playlist"
+                >
+                  <SkipForward className="h-5 w-5" />
+                </button>
+              </>
+            )}
             <button
               type="button"
               onClick={() => togglePlay()}
@@ -438,6 +581,16 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
           </div>
 
           <div className="flex items-center gap-2">
+            {hasPlaylist && (
+              <button
+                type="button"
+                onClick={() => setShowQueue((v) => !v)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-white/10 text-white hover:bg-white/20"
+                aria-label="Queue"
+              >
+                <ListOrdered className="h-5 w-5" />
+              </button>
+            )}
             <div className="hidden sm:flex items-center gap-2 rounded-md bg-white/10 px-2 py-1 text-xs text-white/90">
               <Settings className="h-4 w-4" />
               <label className="sr-only" htmlFor="speed">
@@ -541,6 +694,52 @@ export default function VideoPlayer({ src, poster, title, className }: VideoPlay
             </div>
             <div className="mt-3 text-xs text-white/70">
               Tip: click the player once to toggle play/pause.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Queue overlay */}
+      {hasPlaylist && showQueue && Array.isArray(queue) && (
+        <div className="absolute inset-0 z-20 flex items-start justify-end bg-black/30 p-3 backdrop-blur-[2px]">
+          <div className="w-full max-w-sm rounded-xl border border-white/10 bg-black/70 text-white shadow-2xl">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-white/10">
+              <div className="text-sm font-semibold">Queue</div>
+              <button
+                type="button"
+                onClick={() => setShowQueue(false)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-white/10 hover:bg-white/20"
+                aria-label="Close queue"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="max-h-[70vh] overflow-auto p-2">
+              {queue.map((item, idx) => {
+                const isActive = idx === activeIndex
+                return (
+                  <button
+                    key={`${idx}-${item.label}`}
+                    type="button"
+                    onClick={() => goToIndex(idx, { autoplay: isPlaying })}
+                    className={
+                      'w-full text-left rounded-md px-3 py-2 text-sm transition-colors ' +
+                      (isActive ? 'bg-white/15' : 'hover:bg-white/10')
+                    }
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="truncate font-medium">{item.label}</div>
+                      </div>
+                      <div className="text-xs text-white/70 tabular-nums">{idx + 1}</div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+            <div className="px-3 py-2 border-t border-white/10 text-xs text-white/70">
+              Shortcuts: <span className="font-mono">N</span> next, <span className="font-mono">B</span> prev, <span className="font-mono">Q</span> queue
             </div>
           </div>
         </div>

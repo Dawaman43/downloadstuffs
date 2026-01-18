@@ -63,10 +63,13 @@ type ResultProps = {
     onPageChange?: (page: number) => void
     mediaType?: MediaTypeFilter
     onMediaTypeChange?: (type: MediaTypeFilter) => void
+    sort?: SortOption
+    onSortChange?: (sort: SortOption) => void
     backLinkSearch?: {
         q: string
         page: number
         type: MediaTypeFilter
+        sort?: SortOption
     }
 }
 
@@ -81,6 +84,16 @@ const MEDIA_TYPES = [
     'collection',
 ] as const
 type MediaTypeFilter = (typeof MEDIA_TYPES)[number]
+
+const SORT_OPTIONS = ['relevance', 'downloads', 'recent', 'views'] as const
+type SortOption = (typeof SORT_OPTIONS)[number]
+
+const SORT_LABELS: Record<SortOption, string> = {
+    relevance: 'Relevance',
+    downloads: 'Downloads',
+    recent: 'Most Recent',
+    views: 'Views',
+}
 
 const MEDIA_TYPE_LABELS: Record<MediaTypeFilter, string> = {
     all: 'All',
@@ -101,6 +114,8 @@ export default function Result({
     onPageChange,
     mediaType = 'all',
     onMediaTypeChange,
+    sort = 'relevance',
+    onSortChange,
     backLinkSearch,
 }: ResultProps) {
     const [internalPage, setInternalPage] = React.useState(1)
@@ -217,10 +232,12 @@ export default function Result({
         fromQ: string
         fromPage: number
         fromType: MediaTypeFilter
+        fromSort: SortOption
     } = {
         fromQ: backLinkSearch?.q ?? '',
         fromPage: backLinkSearch?.page ?? 1,
         fromType: backLinkSearch?.type ?? 'all',
+        fromSort: backLinkSearch?.sort ?? 'relevance',
     }
 
     return (
@@ -247,18 +264,41 @@ export default function Result({
                     }}
                     className="w-full"
                 >
-                    <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
-                        <TabsList className="h-auto w-auto inline-flex justify-start p-1 bg-muted/50">
-                            {MEDIA_TYPES.map((t) => (
-                                <TabsTrigger 
-                                    key={t} 
-                                    value={t} 
-                                    className="rounded-sm px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-                                >
-                                    {MEDIA_TYPE_LABELS[t]}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+                            <TabsList className="h-auto w-auto inline-flex justify-start p-1 bg-muted/50">
+                                {MEDIA_TYPES.map((t) => (
+                                    <TabsTrigger 
+                                        key={t} 
+                                        value={t} 
+                                        className="rounded-sm px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                                    >
+                                        {MEDIA_TYPE_LABELS[t]}
+                                    </TabsTrigger>
+                                ))}
+                            </TabsList>
+                        </div>
+
+                        <div className="flex items-center justify-center sm:justify-end gap-2">
+                            <span className="text-sm text-muted-foreground">Sort</span>
+                            <select
+                                value={sort}
+                                onChange={(e) => {
+                                    const next = e.target.value as SortOption
+                                    if (SORT_OPTIONS.includes(next)) onSortChange?.(next)
+                                }}
+                                className={
+                                    "dark:bg-input/30 border-input h-9 rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                                }
+                                aria-label="Sort results"
+                            >
+                                {SORT_OPTIONS.map((opt) => (
+                                    <option key={opt} value={opt}>
+                                        {SORT_LABELS[opt]}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </Tabs>
             </div>

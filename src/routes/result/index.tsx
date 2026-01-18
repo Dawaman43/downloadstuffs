@@ -20,6 +20,9 @@ const MEDIA_TYPES = [
 ] as const satisfies ReadonlyArray<string>
 type MediaTypeFilter = (typeof MEDIA_TYPES)[number]
 
+const SORT_OPTIONS = ['relevance', 'downloads', 'recent', 'views'] as const satisfies ReadonlyArray<string>
+type SortOption = (typeof SORT_OPTIONS)[number]
+
 export const Route = createFileRoute('/result/')({
     head: (({ location }: any) => {
         const href = typeof location?.href === 'string' ? location.href : undefined
@@ -81,11 +84,20 @@ export const Route = createFileRoute('/result/')({
                       : 1
             return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1
         })(),
+        sort: (() => {
+            const raw = (search as any)?.sort
+            if (typeof raw !== 'string') return 'relevance' as const
+            const normalized = raw.trim().toLowerCase()
+            return SORT_OPTIONS.includes(normalized as SortOption)
+                ? (normalized as SortOption)
+                : ('relevance' as const)
+        })(),
     }),
     loaderDeps: (({ search }: any) => ({
         q: search.q,
         type: search.type,
         page: search.page,
+        sort: search.sort,
     })) as any,
     loader: (async ({ deps, request }: any) => {
         if (request) recordPageView(request, { path: '/result' })
@@ -98,6 +110,7 @@ export const Route = createFileRoute('/result/')({
                 type: deps.type,
                 page: deps.page,
                 rows: PAGE_SIZE,
+                sort: deps.sort,
             },
             request,
         )
@@ -117,7 +130,13 @@ export const Route = createFileRoute('/result/')({
                 ? `${boosted} AND mediatype:${deps.type}`
                 : boosted
         return await searchIA({
-            data: { query, rerankQuery: q, page: deps.page, rows: PAGE_SIZE },
+            data: {
+                query,
+                rerankQuery: q,
+                page: deps.page,
+                rows: PAGE_SIZE,
+                sort: deps.sort,
+            },
         })
     }) as any,
     pendingComponent: ResultPending,
@@ -169,7 +188,7 @@ function RouteComponent() {
         if (typeof window !== 'undefined') {
             window.scrollTo({ top: 0, behavior: 'smooth' })
         }
-    }, [page, search.type])
+    }, [page, search.sort, search.type])
 
     React.useEffect(() => {
         if (prevQRef.current !== search.q) {
@@ -198,14 +217,21 @@ function RouteComponent() {
             page={page}
             pageSize={PAGE_SIZE}
             mediaType={search.type}
+            sort={search.sort}
             backLinkSearch={{
                 q: search.q,
                 page,
                 type: search.type,
+                sort: search.sort,
             }}
             onMediaTypeChange={(type) =>
                 navigate({
                     search: (prev) => ({ ...prev, type, page: 1 }),
+                })
+            }
+            onSortChange={(sort) =>
+                navigate({
+                    search: (prev) => ({ ...prev, sort, page: 1 }),
                 })
             }
             onPageChange={(nextPage) =>

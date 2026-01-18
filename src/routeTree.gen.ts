@@ -23,6 +23,7 @@ import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.test
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api.trpc.$'
+import { Route as ApiDownloadPlaylistRouteImport } from './routes/api.download.playlist'
 import { Route as ApiAdminMetricsRouteImport } from './routes/api.admin.metrics'
 import { Route as ApiAdminLogoutRouteImport } from './routes/api.admin.logout'
 import { Route as ApiAdminLoginRouteImport } from './routes/api.admin.login'
@@ -101,6 +102,11 @@ const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   path: '/api/trpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDownloadPlaylistRoute = ApiDownloadPlaylistRouteImport.update({
+  id: '/playlist',
+  path: '/playlist',
+  getParentRoute: () => ApiDownloadRoute,
+} as any)
 const ApiAdminMetricsRoute = ApiAdminMetricsRouteImport.update({
   id: '/api/admin/metrics',
   path: '/api/admin/metrics',
@@ -140,7 +146,7 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/api/download': typeof ApiDownloadRoute
+  '/api/download': typeof ApiDownloadRouteWithChildren
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/trpc-todo': typeof DemoTrpcTodoRoute
   '/result/$id': typeof ResultIdRoute
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/login': typeof ApiAdminLoginRoute
   '/api/admin/logout': typeof ApiAdminLogoutRoute
   '/api/admin/metrics': typeof ApiAdminMetricsRoute
+  '/api/download/playlist': typeof ApiDownloadPlaylistRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -163,7 +170,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/api/download': typeof ApiDownloadRoute
+  '/api/download': typeof ApiDownloadRouteWithChildren
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/trpc-todo': typeof DemoTrpcTodoRoute
   '/result/$id': typeof ResultIdRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/api/admin/login': typeof ApiAdminLoginRoute
   '/api/admin/logout': typeof ApiAdminLogoutRoute
   '/api/admin/metrics': typeof ApiAdminMetricsRoute
+  '/api/download/playlist': typeof ApiDownloadPlaylistRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -187,7 +195,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/api/download': typeof ApiDownloadRoute
+  '/api/download': typeof ApiDownloadRouteWithChildren
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/trpc-todo': typeof DemoTrpcTodoRoute
   '/result/$id': typeof ResultIdRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/api/admin/login': typeof ApiAdminLoginRoute
   '/api/admin/logout': typeof ApiAdminLogoutRoute
   '/api/admin/metrics': typeof ApiAdminMetricsRoute
+  '/api/download/playlist': typeof ApiDownloadPlaylistRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -221,6 +230,7 @@ export interface FileRouteTypes {
     | '/api/admin/login'
     | '/api/admin/logout'
     | '/api/admin/metrics'
+    | '/api/download/playlist'
     | '/api/trpc/$'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/api/admin/login'
     | '/api/admin/logout'
     | '/api/admin/metrics'
+    | '/api/download/playlist'
     | '/api/trpc/$'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/api/admin/login'
     | '/api/admin/logout'
     | '/api/admin/metrics'
+    | '/api/download/playlist'
     | '/api/trpc/$'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -282,7 +294,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
-  ApiDownloadRoute: typeof ApiDownloadRoute
+  ApiDownloadRoute: typeof ApiDownloadRouteWithChildren
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoTrpcTodoRoute: typeof DemoTrpcTodoRoute
   ResultIdRoute: typeof ResultIdRoute
@@ -403,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTrpcSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/download/playlist': {
+      id: '/api/download/playlist'
+      path: '/playlist'
+      fullPath: '/api/download/playlist'
+      preLoaderRoute: typeof ApiDownloadPlaylistRouteImport
+      parentRoute: typeof ApiDownloadRoute
+    }
     '/api/admin/metrics': {
       id: '/api/admin/metrics'
       path: '/api/admin/metrics'
@@ -455,10 +474,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ApiDownloadRouteChildren {
+  ApiDownloadPlaylistRoute: typeof ApiDownloadPlaylistRoute
+}
+
+const ApiDownloadRouteChildren: ApiDownloadRouteChildren = {
+  ApiDownloadPlaylistRoute: ApiDownloadPlaylistRoute,
+}
+
+const ApiDownloadRouteWithChildren = ApiDownloadRoute._addFileChildren(
+  ApiDownloadRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
-  ApiDownloadRoute: ApiDownloadRoute,
+  ApiDownloadRoute: ApiDownloadRouteWithChildren,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoTrpcTodoRoute: DemoTrpcTodoRoute,
   ResultIdRoute: ResultIdRoute,

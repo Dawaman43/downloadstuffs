@@ -38,6 +38,14 @@ export const Route = createFileRoute('/result/$id')({
             : 1
       return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1
     })(),
+    fromSort: (() => {
+      const raw = (search as any)?.fromSort
+      if (typeof raw !== 'string') return 'relevance' as const
+      const normalized = raw.trim().toLowerCase()
+      return ['relevance', 'downloads', 'recent', 'views'].includes(normalized)
+        ? (normalized as 'relevance' | 'downloads' | 'recent' | 'views')
+        : ('relevance' as const)
+    })(),
   }),
   loader: (async ({ params, request }: any) => {
     if (request) {

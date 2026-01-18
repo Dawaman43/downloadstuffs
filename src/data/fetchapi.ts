@@ -241,6 +241,7 @@ const searchInput = z.object({
   page: z.number().optional(),
   rows: z.number().optional(),
   rerank: z.boolean().optional(),
+  sort: z.enum(['relevance', 'downloads', 'recent', 'views']).optional(),
 });
 
 const itemInput = z.object({
@@ -250,13 +251,40 @@ const itemInput = z.object({
 export const searchIA = createServerFn({ method: "GET" })
   .inputValidator(searchInput)
   .handler(async ({ data }) => {
-    const { query, rerankQuery, page = 1, rows = 10, rerank = true } = data;
+    const {
+      query,
+      rerankQuery,
+      page = 1,
+      rows = 10,
+      rerank = true,
+      sort = 'relevance',
+    } = data;
     const start = (page - 1) * rows;
-    const fetchRows = rerank ? Math.min(100, Math.max(rows, rows * 5)) : rows
+    const shouldRerank = rerank && sort === 'relevance'
+    const fetchRows = shouldRerank ? Math.min(100, Math.max(rows, rows * 5)) : rows
+
+    const sortFields: Array<string> = (() => {
+      switch (sort) {
+        case 'downloads':
+          return ['downloads desc']
+        case 'recent':
+          // Internet Archive typically uses publicdate for “Most Recent”.
+          return ['publicdate desc']
+        case 'views':
+          // Best-effort: archive search often exposes a `week` popularity field.
+          // If unavailable for a doc, Solr will still return results.
+          return ['week desc', 'downloads desc']
+        case 'relevance':
+        default:
+          return []
+      }
+    })()
+
+    const sortQuery = sortFields.map((s) => `&sort[]=${encodeURIComponent(s)}`).join('')
 
     const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(
       query
-    )}&fl[]=identifier&fl[]=title&fl[]=creator&fl[]=mediatype&fl[]=date&fl[]=year&fl[]=description&fl[]=downloads&fl[]=subject&fl[]=collection&rows=${fetchRows}&start=${start}&output=json`;
+    )}&fl[]=identifier&fl[]=title&fl[]=creator&fl[]=mediatype&fl[]=date&fl[]=year&fl[]=description&fl[]=downloads&fl[]=subject&fl[]=collection${sortQuery}&rows=${fetchRows}&start=${start}&output=json`;
 
     const res = await fetch(url);
     if (!res.ok) return { docs: [], total: 0 };
@@ -267,7 +295,7 @@ export const searchIA = createServerFn({ method: "GET" })
         ? result.response.numFound
         : docs.length;
 
-    if (!rerank || !Array.isArray(docs) || docs.length === 0) {
+    if (!shouldRerank || !Array.isArray(docs) || docs.length === 0) {
       return { docs, total };
     }
 

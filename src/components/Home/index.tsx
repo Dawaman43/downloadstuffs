@@ -32,7 +32,7 @@ export default function Home() {
             navigate({
                 to: '/result',
                 params: {},
-                search: { q, page: 1, type: 'all' },
+                search: { q, page: 1, type: 'all', sort: 'relevance' },
             })
         },
         [navigate]
