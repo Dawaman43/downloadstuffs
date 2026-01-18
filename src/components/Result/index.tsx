@@ -1,5 +1,12 @@
 import { ArchiveDoc } from "@/types/archive";
-import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import {
+    Card,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+    CardFooter,
+} from "../ui/card";
+import { Button } from "../ui/button";
 
 type ResultProps = {
     data: ArchiveDoc[];
@@ -16,7 +23,7 @@ export default function Result({ data }: ResultProps) {
                 {data.map((item) => (
                     <Card
                         key={item.identifier}
-                        className="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+                        className="flex flex-col justify-between hover:shadow-lg transition-all duration-200"
                     >
                         <CardHeader className="space-y-2">
                             <CardTitle className="text-base line-clamp-2">
@@ -31,6 +38,15 @@ export default function Result({ data }: ResultProps) {
                                 Type: {item.mediatype}
                             </p>
                         </CardHeader>
+
+                        <CardFooter className="pt-0">
+                            <Button
+                                variant="secondary"
+                                className="w-full cursor-pointer text-center"
+                            >
+                                See Details
+                            </Button>
+                        </CardFooter>
                     </Card>
                 ))}
             </div>

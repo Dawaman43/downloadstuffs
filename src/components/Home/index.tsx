@@ -12,19 +12,26 @@ export default function Home() {
     const [results, setResults] = useState<ArchiveDoc[]>([]);
     const searchFn = useServerFn(searchIA);
     const [searchQuery, setSearchQuery] = useState<string>("");
-
+    const [loading, setLoading] = useState(false);
 
 
     const handleSearch = async () => {
-        const result: ArchiveDoc[] = await searchFn({
-            data: {
-                query: searchQuery,
-                page: 1,
-                rows: 10
+        if (!searchQuery) return;
+        setLoading(true);
+        setResults([]);
+        try {
+            const result: ArchiveDoc[] = await searchFn({
+                data: {
+                    query: searchQuery,
+                    page: 1,
+                    rows: 10
+                }
             }
+            );
+            setResults(result);
+        } finally {
+            setLoading(false);
         }
-        );
-        setResults(result);
 
     };
     return (
@@ -38,8 +45,15 @@ export default function Home() {
 
             <div className="flex gap-x-3 ">
                 <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-                <Button onClick={handleSearch} className="cursor-pointer">
-                    <BinocularsIcon size={32} />
+
+                <Button onClick={handleSearch} disabled={loading}>
+                    {loading ? (
+                        <span className="animate-spin">
+                            <BinocularsIcon size={28} />
+                        </span>
+                    ) : (
+                        <BinocularsIcon size={32} />
+                    )}
                 </Button>
             </div>
 
