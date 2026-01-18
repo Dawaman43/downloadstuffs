@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
-import { ArchiveIcon, BinocularsIcon } from '@phosphor-icons/react'
+import { ArchiveIcon, BinocularsIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useNavigate } from '@tanstack/react-router'
 
 export default function Home() {
@@ -32,41 +32,70 @@ export default function Home() {
     )
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="w-full max-w-xl flex flex-col items-center gap-6">
-                <div className="flex gap-x-3 items-center justify-center">
-                    <ArchiveIcon size={30} />
-                    <p className="font-clash font-bold text-3xl sm:text-5xl text-center">
-                        Download stuffs
-                    </p>
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background selection:bg-primary/10">
+            <div className="w-full max-w-2xl flex flex-col items-center">
+                <div className="mb-10 flex flex-col items-center gap-4">
+                    <div className="p-4 rounded-2xl bg-primary/5 text-primary">
+                        <ArchiveIcon size={48} weight="duotone" />
+                    </div>
+                    <div className="space-y-2 text-center">
+                        <h1 className="font-clash font-bold text-4xl sm:text-6xl tracking-tight">
+                            Download <span className="text-primary">Stuffs</span>
+                        </h1>
+                        <p className="text-base sm:text-lg text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                            Access millions of free books, movies, software, and music from Archive.org.
+                        </p>
+                    </div>
                 </div>
-
-                <p className="text-sm text-muted-foreground text-center max-w-md">
-                    Search Archive.org and download items.
-                </p>
 
                 <form
                     onSubmit={handleSearch}
-                    className="w-full flex flex-col sm:flex-row gap-3"
+                    className="w-full group relative flex flex-col sm:flex-row items-stretch gap-3 p-2 rounded-2xl border bg-card shadow-xl transition-all focus-within:ring-2 focus-within:ring-primary/20"
                 >
-                    <Input
-                        value={searchQuery}
-                        onChange={(e) => {
-                            setSearchQuery(e.target.value)
-                            if (loading) setLoading(false)
-                        }}
-                        placeholder="Search (e.g. podcasts, books, software…)"
-                        autoFocus
-                    />
-
-                    <Button type="submit" disabled={!canSearch || loading}>
-                        <BinocularsIcon
-                            size={22}
-                            className={loading ? 'animate-spin' : ''}
+                    <div className="relative flex-1 flex items-center">
+                        <MagnifyingGlassIcon 
+                            size={20} 
+                            className="absolute left-4 text-muted-foreground group-focus-within:text-primary transition-colors" 
                         />
-                        <span className="hidden sm:inline">Search</span>
+                        <Input
+                            value={searchQuery}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value)
+                                if (loading) setLoading(false)
+                            }}
+                            placeholder="What are you looking for?"
+                            className="h-12 pl-11 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 text-lg"
+                            autoFocus
+                        />
+                    </div>
+
+                    <Button 
+                        type="submit" 
+                        disabled={!canSearch || loading}
+                        className="h-12 px-8 rounded-xl font-semibold transition-all active:scale-95"
+                    >
+                        {loading ? (
+                            <BinocularsIcon size={22} className="animate-spin" />
+                        ) : (
+                            <>
+                                <MagnifyingGlassIcon size={20} weight="bold" className="mr-2" />
+                                <span>Search</span>
+                            </>
+                        )}
                     </Button>
                 </form>
+
+                <div className="mt-8 flex flex-wrap justify-center gap-2 opacity-60">
+                    {['Software', 'Movies', 'Books', 'Music'].map((tag) => (
+                        <button
+                            key={tag}
+                            onClick={() => setSearchQuery(tag.toLowerCase())}
+                            className="text-xs font-medium px-3 py-1 rounded-full border hover:bg-secondary hover:text-secondary-foreground transition-colors"
+                        >
+                            {tag}
+                        </button>
+                    ))}
+                </div>
             </div>
         </div>
     )
