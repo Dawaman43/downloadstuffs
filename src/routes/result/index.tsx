@@ -7,12 +7,23 @@ import { Card, CardHeader } from '@/components/ui/card'
 
 const PAGE_SIZE = 10
 
+const MEDIA_TYPES = ['all', 'audio', 'movies', 'software', 'texts', 'image', 'data'] as const
+type MediaTypeFilter = (typeof MEDIA_TYPES)[number]
+
 export const Route = createFileRoute('/result/')({
     validateSearch: (search: unknown) => ({
         q:
             typeof (search as any)?.q === 'string'
                 ? ((search as any).q as string)
                 : '',
+        type: (() => {
+            const raw = (search as any)?.type
+            if (typeof raw !== 'string') return 'all' as const
+            const normalized = raw.trim().toLowerCase()
+            return (MEDIA_TYPES as readonly string[]).includes(normalized)
+                ? (normalized as MediaTypeFilter)
+                : ('all' as const)
+        })(),
         page: (() => {
             const raw = (search as any)?.page
             const n =
@@ -26,13 +37,19 @@ export const Route = createFileRoute('/result/')({
     }),
     loaderDeps: ({ search }) => ({
         q: search.q,
+        type: search.type,
         page: search.page,
     }),
     loader: async ({ deps }) => {
         const q = deps.q.trim()
         if (!q) return { docs: [], total: 0 }
+
+        const query =
+            deps.type && deps.type !== 'all'
+                ? `${q} AND mediatype:${deps.type}`
+                : q
         return await searchIA({
-            data: { query: q, page: deps.page ?? 1, rows: PAGE_SIZE },
+            data: { query, page: deps.page ?? 1, rows: PAGE_SIZE },
         })
     },
     pendingComponent: ResultPending,
@@ -106,6 +123,12 @@ function RouteComponent() {
             totalItems={data.total}
             page={page}
             pageSize={PAGE_SIZE}
+            mediaType={search.type}
+            onMediaTypeChange={(type) =>
+                navigate({
+                    search: (prev) => ({ ...prev, type, page: 1 }),
+                })
+            }
             onPageChange={(nextPage) =>
                 navigate({
                     search: (prev) => ({ ...prev, page: nextPage }),

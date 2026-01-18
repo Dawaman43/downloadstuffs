@@ -9,6 +9,7 @@ import {
 } from '../ui/card'
 import { Button } from '../ui/button'
 import { Link } from '@tanstack/react-router'
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
 
 function stripHtml(input: string) {
     return input.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
@@ -20,11 +21,26 @@ function asArray(value?: string | string[]) {
 }
 
 type ResultProps = {
-    data?: ArchiveDoc[];
-    totalItems?: number;
-    page?: number;
-    pageSize?: number;
-    onPageChange?: (page: number) => void;
+    data?: ArchiveDoc[]
+    totalItems?: number
+    page?: number
+    pageSize?: number
+    onPageChange?: (page: number) => void
+    mediaType?: MediaTypeFilter
+    onMediaTypeChange?: (type: MediaTypeFilter) => void
+}
+
+const MEDIA_TYPES = ['all', 'audio', 'movies', 'software', 'texts', 'image', 'data'] as const
+type MediaTypeFilter = (typeof MEDIA_TYPES)[number]
+
+const MEDIA_TYPE_LABELS: Record<MediaTypeFilter, string> = {
+    all: 'All',
+    audio: 'Audio',
+    movies: 'Movies',
+    software: 'Software',
+    texts: 'Texts',
+    image: 'Images',
+    data: 'Data',
 }
 
 export default function Result({
@@ -33,6 +49,8 @@ export default function Result({
     page: pageProp,
     pageSize: pageSizeProp = 12,
     onPageChange,
+    mediaType = 'all',
+    onMediaTypeChange,
 }: ResultProps) {
     const [internalPage, setInternalPage] = React.useState(1)
 
@@ -131,6 +149,26 @@ export default function Result({
             <h1 className="font-clash text-4xl font-semibold text-center">
                 Search Results
             </h1>
+
+            <div className="flex flex-col items-center gap-3">
+                <Tabs
+                    value={mediaType}
+                    onValueChange={(v) => {
+                        const next = (MEDIA_TYPES as readonly string[]).includes(v)
+                            ? (v as MediaTypeFilter)
+                            : 'all'
+                        onMediaTypeChange?.(next)
+                    }}
+                >
+                    <TabsList className="w-full max-w-xl flex flex-wrap h-auto">
+                        {MEDIA_TYPES.map((t) => (
+                            <TabsTrigger key={t} value={t} className="flex-1">
+                                {MEDIA_TYPE_LABELS[t]}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                </Tabs>
+            </div>
 
             {totalItems === 0 && (
                 <p className="text-center text-muted-foreground">
