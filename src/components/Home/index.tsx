@@ -7,7 +7,7 @@ import { useNavigate } from "@tanstack/react-router";
 export default function Home() {
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+    const navigate = useNavigate({ from: "/" });
 
     const handleSearch = () => {
         if (!searchQuery) return;
@@ -15,7 +15,8 @@ export default function Home() {
         setLoading(true);
 
         navigate({
-            to: "/result/",
+            to: "/result",
+            params: {},
             search: { q: searchQuery },
         });
     };
@@ -31,7 +32,7 @@ export default function Home() {
                 <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search archive.org..."
+                    placeholder="Search stuffs"
                 />
 
                 <Button onClick={handleSearch} disabled={loading}>

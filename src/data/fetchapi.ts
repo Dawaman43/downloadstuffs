@@ -19,26 +19,21 @@ export const searchIA = createServerFn({ method: "GET" })
 
     const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(
       query
-    )}&fl[]=identifier&fl[]=title&fl[]=creator&fl[]=mediatype&rows=${rows}&start=${start}&output=json`;
+    )}&fl[]=identifier&fl[]=title&fl[]=creator&fl[]=mediatype&fl[]=date&fl[]=year&fl[]=description&fl[]=downloads&fl[]=subject&fl[]=collection&rows=${rows}&start=${start}&output=json`;
 
     const res = await fetch(url);
-
-    const text = await res.text();
-    console.log("RAW RESPONSE:", text.slice(0, 500));
-    try {
-      const result = JSON.parse(text);
-      return result.response.docs;
-    } catch (err) {
-      console.error("Failed to parse JSON:", err);
-      return [];
-    }
+    if (!res.ok) return [];
+    const result = await res.json().catch(() => null);
+    if (!result?.response?.docs) return [];
+    return result.response.docs;
   });
 
 export const getArchiveItem = createServerFn({ method: "GET" })
   .inputValidator(itemInput)
   .handler(async ({ data }) => {
     const { id } = data;
-    const url = `https://archive.org/download/${id}/`;
+    const url = `https://archive.org/metadata/${id}`;
     const res = await fetch(url);
+    if (!res.ok) return null;
     return await res.json();
   });
