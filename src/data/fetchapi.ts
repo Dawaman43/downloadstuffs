@@ -1,5 +1,5 @@
-import { createServerFn } from '@tanstack/react-start';
-import { z } from "zod";
+import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 
 const searchInput = z.object({
   query: z.string(),

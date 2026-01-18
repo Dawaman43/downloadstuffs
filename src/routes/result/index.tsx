@@ -4,6 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import * as React from 'react'
 
 import { Card, CardHeader } from '@/components/ui/card'
+import { recordPageView, recordSearch } from '@/server/metrics'
 
 const PAGE_SIZE = 10
 
@@ -20,7 +21,7 @@ const MEDIA_TYPES = [
 type MediaTypeFilter = (typeof MEDIA_TYPES)[number]
 
 export const Route = createFileRoute('/result/')({
-    head: ({ location }) => {
+    head: (({ location }: any) => {
         const href = typeof location?.href === 'string' ? location.href : undefined
         const searchStr =
             typeof location?.searchStr === 'string'
@@ -56,7 +57,7 @@ export const Route = createFileRoute('/result/')({
             ],
             links: href ? [{ rel: 'canonical', href }] : [],
         }
-    },
+    }) as any,
     validateSearch: (search: unknown) => ({
         q:
             typeof (search as any)?.q === 'string'
@@ -81,14 +82,25 @@ export const Route = createFileRoute('/result/')({
             return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1
         })(),
     }),
-    loaderDeps: ({ search }) => ({
+    loaderDeps: (({ search }: any) => ({
         q: search.q,
         type: search.type,
         page: search.page,
-    }),
-    loader: async ({ deps }) => {
+    })) as any,
+    loader: (async ({ deps, request }: any) => {
+        if (request) recordPageView(request, { path: '/result' })
         const q = deps.q.trim()
         if (!q) return { docs: [], total: 0 }
+
+        recordSearch(
+            {
+                q,
+                type: deps.type,
+                page: deps.page ?? 1,
+                rows: PAGE_SIZE,
+            },
+            request,
+        )
 
         const baseQuery = `(${q})`
         const query =
@@ -98,7 +110,7 @@ export const Route = createFileRoute('/result/')({
         return await searchIA({
             data: { query, page: deps.page ?? 1, rows: PAGE_SIZE },
         })
-    },
+    }) as any,
     pendingComponent: ResultPending,
     component: RouteComponent,
 })

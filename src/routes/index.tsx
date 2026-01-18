@@ -1,5 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import Home from '../components/Home';
+import { createFileRoute } from '@tanstack/react-router'
+
+import Home from '../components/Home'
+import { recordPageView } from '@/server/metrics'
 
 export const Route = createFileRoute('/')({
 	head: ({ location }) => {
@@ -28,6 +30,10 @@ export const Route = createFileRoute('/')({
 			],
 			links: url ? [{ rel: 'canonical', href: url }] : [],
 		}
+	},
+	loader: async ({ request }) => {
+		if (request) recordPageView(request)
+		return null
 	},
 	component: Home,
 })

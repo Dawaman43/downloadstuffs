@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { recordDownload, recordDownloadError } from '@/server/metrics'
+
 
 
 function isUnsafePathSegment(value: string) {
@@ -55,6 +57,9 @@ async function handler({ request }: { request: Request }) {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     const status = message.toLowerCase().includes('abort') ? 504 : 502
+
+    recordDownloadError({ id, file, status, message }, request)
+
     return new Response(
       `Upstream fetch failed (${status}).\n\nURL: ${upstreamUrl}\nError: ${message}`,
       {
@@ -66,6 +71,9 @@ async function handler({ request }: { request: Request }) {
 
   if (!upstreamRes.ok || !upstreamRes.body) {
     const text = await upstreamRes.text().catch(() => '')
+
+    recordDownloadError({ id, file, status: upstreamRes.status }, request)
+
     return new Response(text || upstreamRes.statusText, {
       status: upstreamRes.status,
       headers: {
@@ -93,6 +101,8 @@ async function handler({ request }: { request: Request }) {
   }
 
   headers.set('content-disposition', contentDispositionFilename(file))
+
+  recordDownload({ id, file, status: upstreamRes.status }, request)
 
   return new Response(upstreamRes.body, {
     status: upstreamRes.status,

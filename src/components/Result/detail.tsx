@@ -1,19 +1,20 @@
-import { Link, useParams, useSearch } from "@tanstack/react-router";
 import * as React from 'react'
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import VideoPlayer from "@/components/Result/VideoPlayer";
-import { 
-    ArrowLeft, 
-    Download, 
-    ExternalLink, 
-    FileAudio, 
-    FileVideo, 
-    FileImage, 
+import { Link, useParams, useSearch } from '@tanstack/react-router'
+import {
+    ArrowLeft,
+    Download,
+    ExternalLink,
+    FileAudio,
+    FileImage,
     FileText,
-    User
-} from "lucide-react";
+    FileVideo,
+    User,
+} from 'lucide-react'
+
+import VideoPlayer from '@/components/Result/VideoPlayer'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 // --- Helpers ---
 function stripHtml(input: unknown) {
@@ -26,7 +27,7 @@ function stripHtml(input: unknown) {
     return text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-function asArray(value?: string | string[]) {
+function asArray(value?: string | Array<string>) {
     if (!value) return [];
     return Array.isArray(value) ? value : [value];
 }
@@ -40,14 +41,14 @@ type ArchiveFile = {
 };
 
 function isPublicFile(file: ArchiveFile) {
-    return !!file?.name && file.private !== "true";
+    return !!file.name && file.private !== "true";
 }
 
 function getFileIcon(filename: string) {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    if (['mp4', 'mkv', 'webm', 'avi'].includes(ext!)) return <FileVideo className="w-4 h-4" />;
-    if (['mp3', 'wav', 'flac', 'ogg'].includes(ext!)) return <FileAudio className="w-4 h-4" />;
-    if (['jpg', 'png', 'gif', 'webp'].includes(ext!)) return <FileImage className="w-4 h-4" />;
+    const ext = filename.split('.').pop()!.toLowerCase();
+    if (['mp4', 'mkv', 'webm', 'avi'].includes(ext)) return <FileVideo className="w-4 h-4" />;
+    if (['mp3', 'wav', 'flac', 'ogg'].includes(ext)) return <FileAudio className="w-4 h-4" />;
+    if (['jpg', 'png', 'gif', 'webp'].includes(ext)) return <FileImage className="w-4 h-4" />;
     return <FileText className="w-4 h-4" />;
 }
 
@@ -114,7 +115,7 @@ export default function ResultDetails({ item }: { item: any }) {
     const metadata = resolvedItem.metadata as Record<string, any>;
     const subjects = asArray(metadata.subject);
     const description = stripHtml(metadata.description);
-    const files: ArchiveFile[] = Array.isArray(resolvedItem.files) ? resolvedItem.files : [];
+    const files: Array<ArchiveFile> = Array.isArray(resolvedItem.files) ? resolvedItem.files : [];
     const publicFiles = files.filter(isPublicFile);
     const thumbUrl = `https://archive.org/services/img/${id}`;
 
@@ -155,9 +156,9 @@ export default function ResultDetails({ item }: { item: any }) {
                     <Link
                         to="/result"
                         search={() => ({
-                            q: back.fromQ ?? '',
-                            page: back.fromPage ?? 1,
-                            type: back.fromType ?? 'all',
+                            q: back.fromQ,
+                            page: back.fromPage,
+                            type: back.fromType,
                         })}
                         onClick={(e) => {
                             if (!back.fromQ && typeof window !== 'undefined') {
