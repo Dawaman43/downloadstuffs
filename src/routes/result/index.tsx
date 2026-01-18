@@ -140,6 +140,11 @@ function RouteComponent() {
             page={page}
             pageSize={PAGE_SIZE}
             mediaType={search.type}
+            backLinkSearch={{
+                q: search.q,
+                page,
+                type: search.type,
+            }}
             onMediaTypeChange={(type) =>
                 navigate({
                     search: (prev) => ({ ...prev, type, page: 1 }),

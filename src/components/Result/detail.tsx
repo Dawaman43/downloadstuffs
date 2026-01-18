@@ -1,11 +1,23 @@
-import { Link, useParams } from "@tanstack/react-router";
+import { Link, useParams, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { getArchiveItem } from "@/data/fetchapi";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import VideoPlayer from "@/components/Result/VideoPlayer";
+import { 
+    ArrowLeft, 
+    Download, 
+    ExternalLink, 
+    FileAudio, 
+    FileVideo, 
+    FileImage, 
+    FileText,
+    User
+} from "lucide-react";
 
+// --- Helpers ---
 function stripHtml(input: string) {
     return input.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -20,30 +32,25 @@ type ArchiveFile = {
     source?: string;
     format?: string;
     private?: string;
+    size?: string;
 };
 
 function isPublicFile(file: ArchiveFile) {
     return !!file?.name && file.private !== "true";
 }
 
-function pickFirstByExt(files: ArchiveFile[], exts: string[]) {
-    const lowerExts = exts.map((e) => e.toLowerCase());
-    return files.find((f) => {
-        const name = f?.name?.toLowerCase();
-        return !!name && lowerExts.some((ext) => name.endsWith(ext));
-    });
+function getFileIcon(filename: string) {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    if (['mp4', 'mkv', 'webm', 'avi'].includes(ext!)) return <FileVideo className="w-4 h-4" />;
+    if (['mp3', 'wav', 'flac', 'ogg'].includes(ext!)) return <FileAudio className="w-4 h-4" />;
+    if (['jpg', 'png', 'gif', 'webp'].includes(ext!)) return <FileImage className="w-4 h-4" />;
+    return <FileText className="w-4 h-4" />;
 }
 
-function filterByExt(files: ArchiveFile[], exts: string[]) {
-    const lowerExts = exts.map((e) => e.toLowerCase());
-    return files.filter((f) => {
-        const name = f?.name?.toLowerCase();
-        return !!name && lowerExts.some((ext) => name.endsWith(ext));
-    });
-}
-
+// --- Main Component ---
 export default function ResultDetails() {
     const { id } = useParams({ from: "/result/$id" });
+    const back = useSearch({ from: "/result/$id" });
     const fetchItem = useServerFn(getArchiveItem);
 
     const [item, setItem] = useState<any>(null);
@@ -57,222 +64,248 @@ export default function ResultDetails() {
         });
     }, [id, fetchItem]);
 
-    if (loading)
-        return (
-            <div className="max-w-3xl mx-auto py-10 space-y-6">
-                <div className="flex flex-col items-center gap-2">
-                    <div className="text-sm text-muted-foreground flex items-center gap-2">
-                        <span className="inline-block h-4 w-4 rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground animate-spin" />
-                        <span>Loading details…</span>
-                    </div>
-                </div>
+    // --- Loading State ---
+    if (loading) return <LoadingSkeleton />;
+    if (!item?.metadata) return <div className="p-10 text-center">Item not found.</div>;
 
-                <Card>
-                    <CardHeader className="space-y-3">
-                        <div className="h-6 w-3/4 bg-muted animate-pulse rounded" />
-                        <div className="h-4 w-1/3 bg-muted animate-pulse rounded" />
-                        <div className="h-3 w-1/2 bg-muted animate-pulse rounded" />
-                    </CardHeader>
-                </Card>
-
-                <Card>
-                    <CardHeader className="space-y-4">
-                        <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                        <div className="h-72 w-full bg-muted animate-pulse rounded-md" />
-                    </CardHeader>
-                </Card>
-
-                <Card>
-                    <CardHeader className="space-y-3">
-                        <div className="h-4 w-28 bg-muted animate-pulse rounded" />
-                        <div className="h-3 w-full bg-muted animate-pulse rounded" />
-                        <div className="h-3 w-11/12 bg-muted animate-pulse rounded" />
-                        <div className="h-3 w-10/12 bg-muted animate-pulse rounded" />
-                    </CardHeader>
-                </Card>
-            </div>
-        );
-    if (!item?.metadata) return <p>Could not load item.</p>;
-
+    // --- Data Processing ---
     const metadata = item.metadata as Record<string, any>;
     const subjects = asArray(metadata.subject);
-    const collections = asArray(metadata.collection);
     const description = typeof metadata.description === "string" ? stripHtml(metadata.description) : "";
-
     const files: ArchiveFile[] = Array.isArray(item.files) ? item.files : [];
     const publicFiles = files.filter(isPublicFile);
-
     const thumbUrl = `https://archive.org/services/img/${id}`;
 
-    const videoFile =
-        pickFirstByExt(publicFiles, [".mp4", ".webm", ".m4v", ".ogv"]) ??
-        pickFirstByExt(publicFiles.filter((f) => f.source === "original"), [".mp4", ".webm", ".m4v", ".ogv"]);
-    const audioFile =
-        pickFirstByExt(publicFiles, [".mp3", ".ogg", ".m4a", ".flac", ".wav"]) ??
-        pickFirstByExt(publicFiles.filter((f) => f.source === "original"), [".mp3", ".ogg", ".m4a", ".flac", ".wav"]);
-    const imageFiles = filterByExt(publicFiles, [".jpg", ".jpeg", ".png", ".webp", ".gif"]).slice(0, 24);
+    // Logic to find best media
+    const videoFile = publicFiles.find(f => ['.mp4', '.webm'].some(ext => f.name?.endsWith(ext)) && f.source === 'original') 
+                   || publicFiles.find(f => ['.mp4', '.webm'].some(ext => f.name?.endsWith(ext)));
+                   
+    const audioFile: ArchiveFile | undefined = videoFile
+        ? undefined
+        : publicFiles.find(
+              (f) =>
+                  ['.mp3', '.ogg', '.flac'].some((ext) => f.name?.endsWith(ext)) &&
+                  f.source === 'original'
+          ) ||
+          publicFiles.find((f) =>
+              ['.mp3', '.ogg', '.flac'].some((ext) => f.name?.endsWith(ext))
+          );
 
-    const downloadableFiles = publicFiles
-        .filter((f) => f.source === "original")
-        .slice(0, 12);
-
-    const preferredDownloadName =
-        videoFile?.name ?? audioFile?.name ?? downloadableFiles[0]?.name;
+    const imageFiles = publicFiles.filter(f => ['.jpg', '.jpeg', '.png', '.webp'].some(ext => f.name?.endsWith(ext))).slice(0, 12);
+    const downloadableFiles = publicFiles.filter((f) => f.source === "original" && !f.name?.endsWith('.xml') && !f.name?.endsWith('.sqlite')).slice(0, 8);
+    const preferredDownloadName = videoFile?.name ?? audioFile?.name ?? downloadableFiles[0]?.name;
 
     return (
-        <div className="max-w-3xl mx-auto py-10 space-y-6">
-            <div className="flex items-center gap-2">
-                <Button asChild variant="ghost" size="icon" className="h-9 w-9">
-                    <Link to="/" aria-label="Back to home">
-                        <ArrowLeft className="h-5 w-5" />
-                    </Link>
-                </Button>
-                <span className="text-sm text-muted-foreground">Back</span>
+        <div className="relative min-h-screen w-full bg-background overflow-hidden selection:bg-primary/20">
+            {/* Ambient Background */}
+            <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
+                <img 
+                    src={thumbUrl} 
+                    className="w-full h-full object-cover blur-[100px] scale-110" 
+                    alt="" 
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-background via-background/80 to-background/20" />
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-2xl">{metadata.title}</CardTitle>
-                    <CardDescription>{metadata.creator}</CardDescription>
-                    <p className="text-sm text-muted-foreground">
-                        {metadata.mediatype}
-                        {metadata.date ? ` • ${metadata.date}` : ""}
-                        {metadata.year ? ` • ${metadata.year}` : ""}
-                    </p>
-                </CardHeader>
-            </Card>
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-12">
+                {/* Navigation */}
+                <div className="mb-8">
+                    <Link
+                        to="/result"
+                        search={() => ({
+                            q: back.fromQ ?? '',
+                            page: back.fromPage ?? 1,
+                            type: back.fromType ?? 'all',
+                        })}
+                        onClick={(e) => {
+                            if (!back.fromQ && typeof window !== 'undefined') {
+                                e.preventDefault()
+                                window.history.back()
+                            }
+                        }}
+                        className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
+                    >
+                        <div className="p-2 rounded-full bg-background/50 border backdrop-blur-sm group-hover:border-primary/50 transition-colors">
+                            <ArrowLeft className="w-4 h-4" />
+                        </div>
+                        <span>Back to Results</span>
+                    </Link>
+                </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg">Preview</CardTitle>
-                    <div className="space-y-4">
-                        <img
-                            src={thumbUrl}
-                            alt={metadata.title}
-                            loading="lazy"
-                            className="w-full max-h-96 object-contain rounded-md bg-muted"
-                            onError={(e) => {
-                                ;(e.currentTarget as HTMLImageElement).style.display = 'none'
-                            }}
-                        />
+                <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-16 items-start">
+                    
+                    {/* LEFT COLUMN: Media Player & Visuals */}
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="relative rounded-2xl overflow-hidden bg-black/5 border shadow-2xl shadow-black/10 aspect-video lg:aspect-auto">
+                            {videoFile ? (
+                                <VideoPlayer
+                                    title={metadata.title}
+                                    poster={thumbUrl}
+                                    src={`https://archive.org/download/${id}/${encodeURIComponent(videoFile.name!)}`}
+                                    className="h-full w-full"
+                                />
+                            ) : audioFile ? (
+                                <div className="flex flex-col items-center justify-center p-10 h-full min-h-100 bg-secondary/10 backdrop-blur-sm">
+                                    <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-xl shadow-2xl overflow-hidden mb-8">
+                                        <img src={thumbUrl} className="w-full h-full object-cover" alt="Album Art" />
+                                    </div>
+                                    <audio
+                                        controls
+                                        className="w-full max-w-md"
+                                        src={`https://archive.org/download/${id}/${encodeURIComponent(audioFile.name!)}`}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="w-full h-full min-h-100 bg-secondary/5 flex items-center justify-center">
+                                    <img 
+                                        src={thumbUrl} 
+                                        className="w-full h-full object-contain" 
+                                        alt={metadata.title} 
+                                    />
+                                </div>
+                            )}
+                        </div>
 
-                        {videoFile?.name ? (
-                            <video
-                                controls
-                                preload="metadata"
-                                className="w-full rounded-md bg-black"
-                                poster={thumbUrl}
-                                src={`https://archive.org/download/${id}/${encodeURIComponent(videoFile.name)}`}
-                            />
-                        ) : null}
-
-                        {!videoFile?.name && audioFile?.name ? (
-                            <audio
-                                controls
-                                preload="metadata"
-                                className="w-full"
-                                src={`https://archive.org/download/${id}/${encodeURIComponent(audioFile.name)}`}
-                            />
-                        ) : null}
-
-                        {imageFiles.length > 0 ? (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                {imageFiles.map((f) => (
-                                    <a
-                                        key={f.name}
+                        {/* Image Gallery Grid (if separate images exist) */}
+                        {imageFiles.length > 0 && !videoFile && (
+                            <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                                {imageFiles.map((f, i) => (
+                                    <a 
+                                        key={i} 
                                         href={`https://archive.org/download/${id}/${encodeURIComponent(f.name!)}`}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="block"
+                                        className="block aspect-square rounded-md overflow-hidden opacity-70 hover:opacity-100 hover:ring-2 ring-primary transition-all"
                                     >
-                                        <img
+                                        <img 
                                             src={`https://archive.org/download/${id}/${encodeURIComponent(f.name!)}`}
-                                            alt={f.name}
+                                            className="w-full h-full object-cover"
                                             loading="lazy"
-                                            className="h-32 w-full object-cover rounded-md bg-muted"
-                                            onError={(e) => {
-                                                ;(e.currentTarget as HTMLImageElement).style.display = 'none'
-                                            }}
                                         />
                                     </a>
                                 ))}
                             </div>
-                        ) : null}
+                        )}
                     </div>
-                </CardHeader>
-            </Card>
 
-            {description && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg">Description</CardTitle>
-                        <CardDescription className="leading-relaxed">
-                            {description}
-                        </CardDescription>
-                    </CardHeader>
-                </Card>
-            )}
-
-            {(subjects.length > 0 || collections.length > 0) && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg">Metadata</CardTitle>
-                        <div className="space-y-2 text-sm text-muted-foreground">
-                            {subjects.length > 0 && (
-                                <p>
-                                    <span className="font-medium text-foreground">Subjects:</span> {subjects.slice(0, 10).join(", ")}
-                                </p>
-                            )}
-                            {collections.length > 0 && (
-                                <p>
-                                    <span className="font-medium text-foreground">Collections:</span> {collections.slice(0, 10).join(", ")}
-                                </p>
-                            )}
+                    {/* RIGHT COLUMN: Metadata & Actions */}
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                        
+                        {/* Title Section */}
+                        <div className="space-y-4">
+                            <div className="flex flex-wrap gap-2">
+                                <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs font-normal bg-primary/10 text-primary hover:bg-primary/20">
+                                    {metadata.mediatype}
+                                </Badge>
+                                {metadata.year && (
+                                    <Badge variant="outline" className="rounded-full px-3 py-1 text-xs font-normal border-primary/20">
+                                        {metadata.year}
+                                    </Badge>
+                                )}
+                            </div>
+                            
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.1]">
+                                {metadata.title}
+                            </h1>
+                            
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <User className="w-4 h-4" />
+                                <span className="text-sm font-medium">{metadata.creator || "Unknown Creator"}</span>
+                            </div>
                         </div>
-                    </CardHeader>
-                </Card>
-            )}
 
-            {downloadableFiles.length > 0 && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg">Files</CardTitle>
-                        <div className="space-y-2">
-                            {downloadableFiles.map((f) => (
+                        {/* Actions */}
+                        <div className="flex flex-wrap gap-3 py-2">
+                            <Button className="rounded-full h-12 px-6 shadow-lg shadow-primary/20" asChild>
                                 <a
-                                    key={f.name}
-                                    className="block text-sm underline underline-offset-4"
-                                    href={`/api/download?id=${encodeURIComponent(id)}&file=${encodeURIComponent(f.name!)}`}
-                                    rel="noreferrer"
+                                    href={preferredDownloadName ? `/api/download?id=${encodeURIComponent(id)}&file=${encodeURIComponent(preferredDownloadName)}` : '#'}
                                 >
-                                    {f.name}
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Download Now
                                 </a>
-                            ))}
+                            </Button>
+                            <Button variant="outline" className="rounded-full h-12 px-6" asChild>
+                                <a href={`https://archive.org/details/${id}`} target="_blank" rel="noreferrer">
+                                    <ExternalLink className="w-4 h-4 mr-2" />
+                                    Archive.org
+                                </a>
+                            </Button>
                         </div>
-                    </CardHeader>
-                </Card>
-            )}
 
-            <div className="flex flex-col sm:flex-row gap-3">
-                <Button asChild disabled={!preferredDownloadName}>
-                    <a
-                        href={
-                            preferredDownloadName
-                                ? `/api/download?id=${encodeURIComponent(id)}&file=${encodeURIComponent(preferredDownloadName)}`
-                                : undefined
-                        }
-                        rel="noreferrer"
-                    >
-                        Download from Archive.org
-                    </a>
-                </Button>
+                        {/* Description */}
+                        {description && (
+                            <div className="prose prose-sm dark:prose-invert text-muted-foreground/90 leading-relaxed max-w-none">
+                                <p className="line-clamp-10 whitespace-pre-line">{description}</p>
+                            </div>
+                        )}
 
-                <Button variant="secondary" asChild>
-                    <a href={`https://archive.org/details/${id}`} target="_blank" rel="noreferrer">
-                        View on Archive.org
-                    </a>
-                </Button>
+                        {/* Tags */}
+                        {subjects.length > 0 && (
+                            <div className="space-y-3">
+                                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Tags</h3>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {subjects.slice(0, 8).map((sub, i) => (
+                                        <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md bg-secondary/50 text-secondary-foreground text-xs hover:bg-secondary transition-colors cursor-default">
+                                            #{sub}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* File List (Compact) */}
+                        <div className="pt-4 border-t border-border/50">
+                            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">Included Files</h3>
+                            <ScrollArea className="h-50 w-full rounded-xl border bg-card/50 px-4">
+                                <div className="py-2 space-y-1">
+                                    {downloadableFiles.map((f, i) => (
+                                        <a
+                                            key={i}
+                                            href={`/api/download?id=${encodeURIComponent(id)}&file=${encodeURIComponent(f.name!)}`}
+                                            className="group flex items-center justify-between p-2 rounded-lg hover:bg-accent transition-colors text-sm"
+                                        >
+                                            <div className="flex items-center gap-3 overflow-hidden">
+                                                <div className="text-muted-foreground group-hover:text-primary transition-colors">
+                                                    {getFileIcon(f.name!)}
+                                                </div>
+                                                <span className="truncate text-foreground/80 group-hover:text-foreground font-medium">
+                                                    {f.name}
+                                                </span>
+                                            </div>
+                                            <Download className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+                                        </a>
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
+}
+
+// --- Minimal Skeleton ---
+function LoadingSkeleton() {
+    return (
+        <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
+            <div className="w-32 h-6 bg-muted rounded-full animate-pulse" />
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-16">
+                <div className="aspect-video w-full bg-muted/50 rounded-2xl animate-pulse" />
+                <div className="space-y-6">
+                    <div className="space-y-3">
+                        <div className="h-4 w-20 bg-muted rounded-full animate-pulse" />
+                        <div className="h-10 w-3/4 bg-muted rounded-lg animate-pulse" />
+                        <div className="h-5 w-1/3 bg-muted rounded animate-pulse" />
+                    </div>
+                    <div className="h-12 w-40 bg-muted rounded-full animate-pulse" />
+                    <div className="space-y-2 pt-4">
+                        <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                        <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                        <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }

@@ -25,8 +25,14 @@ import {
     ArrowLeft,
 } from 'lucide-react'
 
-function stripHtml(input: string) {
-    return input.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+function stripHtml(input: unknown) {
+    if (input == null) return ''
+    const text = Array.isArray(input)
+        ? input.filter((v) => typeof v === 'string' && v.trim().length > 0).join(' ')
+        : typeof input === 'string'
+          ? input
+          : String(input)
+    return text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
 function asArray(value?: string | string[]) {
@@ -57,6 +63,11 @@ type ResultProps = {
     onPageChange?: (page: number) => void
     mediaType?: MediaTypeFilter
     onMediaTypeChange?: (type: MediaTypeFilter) => void
+    backLinkSearch?: {
+        q: string
+        page: number
+        type: MediaTypeFilter
+    }
 }
 
 const MEDIA_TYPES = [
@@ -90,6 +101,7 @@ export default function Result({
     onPageChange,
     mediaType = 'all',
     onMediaTypeChange,
+    backLinkSearch,
 }: ResultProps) {
     const [internalPage, setInternalPage] = React.useState(1)
 
@@ -201,6 +213,16 @@ export default function Result({
         </div>
     )
 
+    const detailSearch: {
+        fromQ: string
+        fromPage: number
+        fromType: MediaTypeFilter
+    } = {
+        fromQ: backLinkSearch?.q ?? '',
+        fromPage: backLinkSearch?.page ?? 1,
+        fromType: backLinkSearch?.type ?? 'all',
+    }
+
     return (
         <div className="container mx-auto max-w-7xl px-4 md:px-6 py-8 space-y-8">
             <div className="space-y-4 text-center sm:text-left">
@@ -263,6 +285,7 @@ export default function Result({
                                     key={item.identifier}
                                     to="/result/$id" 
                                     params={{ id: item.identifier }}
+                                    search={() => detailSearch}
                                     className="group block h-full outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xl"
                                 >
                                     <Card className="h-full flex flex-col overflow-hidden border-border/50 hover:border-border hover:shadow-md transition-all duration-300">
@@ -299,7 +322,7 @@ export default function Result({
                                         </CardHeader>
 
                                         <CardContent className="p-4 pt-0 grow">
-                                            {item.description && (
+                                            {stripHtml(item.description) && (
                                                 <p className="text-xs text-muted-foreground line-clamp-3 mb-3">
                                                     {stripHtml(item.description)}
                                                 </p>
