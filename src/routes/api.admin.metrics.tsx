@@ -1,6 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { isAdminRequest, requireAdminPasswordConfigured } from '@/server/adminAuth'
+import {
+  isAdminRequest,
+  isAllowedAdminIp,
+  requireAdminPasswordConfigured,
+} from '@/server/adminAuth'
 import { getMetricsSnapshot } from '@/server/metrics'
 
 function handler({ request }: { request: Request }) {
@@ -12,6 +16,10 @@ function handler({ request }: { request: Request }) {
       status: 500,
       headers: { 'content-type': 'text/plain; charset=utf-8' },
     })
+  }
+
+  if (!isAllowedAdminIp(request)) {
+    return new Response('Forbidden', { status: 403 })
   }
 
   if (!isAdminRequest(request)) {

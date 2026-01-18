@@ -1,8 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { clearAdminSessionCookie } from '@/server/adminAuth'
+import { clearAdminSessionCookie, isAdminRequest, isAllowedAdminIp } from '@/server/adminAuth'
 
-function handler() {
+function handler({ request }: { request: Request }) {
+  if (!isAllowedAdminIp(request)) {
+    return new Response('Forbidden', { status: 403 })
+  }
+
+  if (!isAdminRequest(request)) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+
   const headers = new Headers({ 'content-type': 'application/json; charset=utf-8' })
   clearAdminSessionCookie(headers)
 

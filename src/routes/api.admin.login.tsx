@@ -1,6 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import {
+  checkAdminLoginRateLimit,
+  isAllowedAdminIp,
+  recordAdminLoginFailure,
   requireAdminPasswordConfigured,
   setAdminSessionCookie,
   verifyAdminPassword,
@@ -14,6 +17,21 @@ async function handler({ request }: { request: Request }) {
     return new Response(message, {
       status: 500,
       headers: { 'content-type': 'text/plain; charset=utf-8' },
+    })
+  }
+
+  if (!isAllowedAdminIp(request)) {
+    return new Response('Forbidden', { status: 403 })
+  }
+
+  const rl = checkAdminLoginRateLimit(request)
+  if (!rl.ok) {
+    return new Response('Too many attempts', {
+      status: 429,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'retry-after': String(rl.retryAfterSeconds),
+      },
     })
   }
 
@@ -35,6 +53,7 @@ async function handler({ request }: { request: Request }) {
   }
 
   if (!verifyAdminPassword(password)) {
+    recordAdminLoginFailure(request)
     return new Response('Unauthorized', { status: 401 })
   }
 

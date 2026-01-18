@@ -49,12 +49,17 @@ function AdminPage() {
       setMetrics(null)
       return false
     }
+    if (res.status === 403) {
+      setMetrics(null)
+      setStatus('Forbidden. Check ADMIN_ALLOWED_IPS (if set).')
+      return false
+    }
     if (res.status === 500) {
       const text = await res.text().catch(() => '')
       setMetrics(null)
       setStatus(
         text?.trim() ||
-          'Server misconfigured. Set ADMIN_PASSWORD and ADMIN_SESSION_SECRET.',
+          'Server misconfigured. Set ADMIN_SESSION_SECRET and ADMIN_PASSWORD (or ADMIN_PASSWORD_HASH).',
       )
       return false
     }
@@ -100,6 +105,21 @@ function AdminPage() {
         return
       }
 
+      if (res.status === 403) {
+        setStatus('Forbidden. Your IP is not allowed.')
+        return
+      }
+
+      if (res.status === 429) {
+        const retryAfter = res.headers.get('retry-after')
+        setStatus(
+          retryAfter
+            ? `Too many attempts. Try again in ${retryAfter}s.`
+            : 'Too many attempts. Try again later.',
+        )
+        return
+      }
+
       if (!res.ok) {
         const text = await res.text().catch(() => '')
         setStatus(text || `Login failed (${res.status})`)
@@ -141,6 +161,10 @@ function AdminPage() {
           <p className="text-sm text-muted-foreground">
             Private dashboard. Set <code className="font-mono">ADMIN_PASSWORD</code> and{' '}
             <code className="font-mono">ADMIN_SESSION_SECRET</code> in your environment.
+            <span className="block">
+              Optional: <code className="font-mono">ADMIN_PASSWORD_HASH</code> (preferred) and{' '}
+              <code className="font-mono">ADMIN_ALLOWED_IPS</code>.
+            </span>
           </p>
         </div>
         {metrics ? (
