@@ -7,6 +7,9 @@ const searchInput = z.object({
   rows: z.number().optional()
 });
 
+const itemInput = z.object({
+  id: z.string()
+});
 
 export const searchIA = createServerFn({ method: "GET" })
   .inputValidator(searchInput)
@@ -31,3 +34,11 @@ export const searchIA = createServerFn({ method: "GET" })
     }
   });
 
+export const getArchiveItem = createServerFn({ method: "GET" })
+  .inputValidator(itemInput)
+  .handler(async ({ data }) => {
+    const { id } = data;
+    const url = `https://archive.org/download/${id}/`;
+    const res = await fetch(url);
+    return await res.json();
+  });
