@@ -20,6 +20,43 @@ const MEDIA_TYPES = [
 type MediaTypeFilter = (typeof MEDIA_TYPES)[number]
 
 export const Route = createFileRoute('/result/')({
+    head: ({ location }) => {
+        const href = typeof location?.href === 'string' ? location.href : undefined
+        const searchStr =
+            typeof location?.searchStr === 'string'
+                ? location.searchStr
+                : typeof location?.search === 'string'
+                  ? location.search
+                  : ''
+        const sp = new URLSearchParams(searchStr.startsWith('?') ? searchStr.slice(1) : searchStr)
+        const q = (sp.get('q') ?? '').trim()
+        const page = sp.get('page')
+        const type = (sp.get('type') ?? '').trim()
+
+        const baseTitle = q ? `Results for “${q}”` : 'Search Results'
+        const titleParts = [baseTitle]
+        if (type && type !== 'all') titleParts.push(type)
+        if (page && page !== '1') titleParts.push(`Page ${page}`)
+        titleParts.push('DownloadStuffs')
+
+        const title = titleParts.join(' — ')
+        const description = q
+            ? `Browse Internet Archive results for “${q}” with filtering and pagination.`
+            : 'Browse Internet Archive results with filtering and pagination.'
+
+        return {
+            meta: [
+                { title },
+                { name: 'description', content: description },
+                { property: 'og:title', content: title },
+                { property: 'og:description', content: description },
+                ...(href ? [{ property: 'og:url', content: href }] : []),
+                { name: 'twitter:title', content: title },
+                { name: 'twitter:description', content: description },
+            ],
+            links: href ? [{ rel: 'canonical', href }] : [],
+        }
+    },
     validateSearch: (search: unknown) => ({
         q:
             typeof (search as any)?.q === 'string'

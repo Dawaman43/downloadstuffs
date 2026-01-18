@@ -1,7 +1,5 @@
 import { Link, useParams, useSearch } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { getArchiveItem } from "@/data/fetchapi";
-import { useEffect, useState } from "react";
+import * as React from 'react'
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,8 +16,14 @@ import {
 } from "lucide-react";
 
 // --- Helpers ---
-function stripHtml(input: string) {
-    return input.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+function stripHtml(input: unknown) {
+    if (input == null) return "";
+    const text = Array.isArray(input)
+        ? input.filter((v) => typeof v === "string" && v.trim().length > 0).join(" ")
+        : typeof input === "string"
+          ? input
+          : String(input);
+    return text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
 function asArray(value?: string | string[]) {
@@ -48,31 +52,69 @@ function getFileIcon(filename: string) {
 }
 
 // --- Main Component ---
-export default function ResultDetails() {
+export default function ResultDetails({ item }: { item: any }) {
     const { id } = useParams({ from: "/result/$id" });
     const back = useSearch({ from: "/result/$id" });
-    const fetchItem = useServerFn(getArchiveItem);
 
-    const [item, setItem] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const [fallbackItem, setFallbackItem] = React.useState<any>(null)
+    const [fallbackLoading, setFallbackLoading] = React.useState(false)
 
-    useEffect(() => {
-        setLoading(true);
-        fetchItem({ data: { id } }).then((res) => {
-            setItem(res);
-            setLoading(false);
-        });
-    }, [id, fetchItem]);
+    React.useEffect(() => {
+        if (item?.metadata) return
+        if (!id) return
 
-    // --- Loading State ---
-    if (loading) return <LoadingSkeleton />;
-    if (!item?.metadata) return <div className="p-10 text-center">Item not found.</div>;
+        let cancelled = false
+        setFallbackLoading(true)
+
+        fetch(`https://archive.org/metadata/${encodeURIComponent(id)}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .then((json) => {
+                if (cancelled) return
+                setFallbackItem(json)
+            })
+            .catch(() => {
+                if (cancelled) return
+                setFallbackItem(null)
+            })
+            .finally(() => {
+                if (cancelled) return
+                setFallbackLoading(false)
+            })
+
+        return () => {
+            cancelled = true
+        }
+    }, [id, item?.metadata])
+
+    const resolvedItem = item?.metadata ? item : fallbackItem
+
+    if (!resolvedItem?.metadata) {
+        return (
+            <div className="p-10 text-center space-y-3">
+                <div className="text-lg font-medium">
+                    {fallbackLoading ? 'Loading item…' : 'Item not found.'}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                    {id ? (
+                        <a
+                            className="underline"
+                            href={`https://archive.org/details/${encodeURIComponent(id)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            Open on archive.org
+                        </a>
+                    ) : null}
+                </div>
+            </div>
+        )
+    }
 
     // --- Data Processing ---
-    const metadata = item.metadata as Record<string, any>;
+    const metadata = resolvedItem.metadata as Record<string, any>;
     const subjects = asArray(metadata.subject);
-    const description = typeof metadata.description === "string" ? stripHtml(metadata.description) : "";
-    const files: ArchiveFile[] = Array.isArray(item.files) ? item.files : [];
+    const description = stripHtml(metadata.description);
+    const files: ArchiveFile[] = Array.isArray(resolvedItem.files) ? resolvedItem.files : [];
     const publicFiles = files.filter(isPublicFile);
     const thumbUrl = `https://archive.org/services/img/${id}`;
 
@@ -285,8 +327,7 @@ export default function ResultDetails() {
     );
 }
 
-// --- Minimal Skeleton ---
-function LoadingSkeleton() {
+export function ResultDetailsSkeleton() {
     return (
         <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
             <div className="w-32 h-6 bg-muted rounded-full animate-pulse" />

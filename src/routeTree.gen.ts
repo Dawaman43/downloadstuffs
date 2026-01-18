@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ResultIndexRouteImport } from './routes/result/index'
+import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as ResultIdRouteImport } from './routes/result/$id'
 import { Route as DemoTrpcTodoRouteImport } from './routes/demo/trpc-todo'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
@@ -34,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 const ResultIndexRoute = ResultIndexRouteImport.update({
   id: '/result/',
   path: '/result/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapXmlRoute = SitemapXmlRouteImport.update({
+  id: '/sitemap/xml',
+  path: '/sitemap/xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResultIdRoute = ResultIdRouteImport.update({
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/trpc-todo': typeof DemoTrpcTodoRoute
   '/result/$id': typeof ResultIdRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/result': typeof ResultIndexRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/trpc-todo': typeof DemoTrpcTodoRoute
   '/result/$id': typeof ResultIdRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/result': typeof ResultIndexRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/trpc-todo': typeof DemoTrpcTodoRoute
   '/result/$id': typeof ResultIdRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/result/': typeof ResultIndexRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/demo/trpc-todo'
     | '/result/$id'
+    | '/sitemap/xml'
     | '/result'
     | '/api/trpc/$'
     | '/demo/api/names'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/demo/trpc-todo'
     | '/result/$id'
+    | '/sitemap/xml'
     | '/result'
     | '/api/trpc/$'
     | '/demo/api/names'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/demo/trpc-todo'
     | '/result/$id'
+    | '/sitemap/xml'
     | '/result/'
     | '/api/trpc/$'
     | '/demo/api/names'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoTrpcTodoRoute: typeof DemoTrpcTodoRoute
   ResultIdRoute: typeof ResultIdRoute
+  SitemapXmlRoute: typeof SitemapXmlRoute
   ResultIndexRoute: typeof ResultIndexRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/result'
       fullPath: '/result'
       preLoaderRoute: typeof ResultIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap/xml': {
+      id: '/sitemap/xml'
+      path: '/sitemap/xml'
+      fullPath: '/sitemap/xml'
+      preLoaderRoute: typeof SitemapXmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/result/$id': {
@@ -361,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoTrpcTodoRoute: DemoTrpcTodoRoute,
   ResultIdRoute: ResultIdRoute,
+  SitemapXmlRoute: SitemapXmlRoute,
   ResultIndexRoute: ResultIndexRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,

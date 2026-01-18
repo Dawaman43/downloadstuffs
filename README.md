@@ -1,4 +1,19 @@
-Welcome to your new TanStack app! 
+## DownloadStuffs
+
+Search the Internet Archive, browse results with filtering + pagination, and download public items. Includes a custom built-in video player with helpful shortcuts.
+
+### SEO
+
+- `robots.txt` is served from `public/robots.txt`
+- Sitemap is served from `/sitemap/xml` (generated dynamically so it works on any domain)
+
+### Open Source
+
+- License: see `LICENSE`
+- Contributing: see `CONTRIBUTING.md`
+- Security: see `SECURITY.md`
+
+---
 
 # Getting Started
 
