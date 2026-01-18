@@ -41,6 +41,7 @@ function AdminPage() {
   const [status, setStatus] = React.useState<string | null>(null)
   const [loading, setLoading] = React.useState(false)
   const [metrics, setMetrics] = React.useState<MetricsSnapshot | null>(null)
+  const [tab, setTab] = React.useState('overview')
 
   const fetchMetrics = React.useCallback(async () => {
     const res = await fetch('/api/admin/metrics', { credentials: 'include' })
@@ -69,13 +70,18 @@ function AdminPage() {
   React.useEffect(() => {
     // Try to load metrics immediately if already logged in
     fetchMetrics().catch(() => {})
+  }, [fetchMetrics])
+
+  React.useEffect(() => {
+    // Only poll while authenticated; stop immediately on 401.
+    if (!metrics) return
 
     const interval = window.setInterval(() => {
       fetchMetrics().catch(() => {})
     }, 5000)
 
     return () => window.clearInterval(interval)
-  }, [fetchMetrics])
+  }, [fetchMetrics, metrics])
 
   async function onLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -178,7 +184,7 @@ function AdminPage() {
             <MetricCard label="Errors" value={fmt.format(metrics.counters.downloadErrors)} />
           </div>
 
-          <Tabs defaultValue="overview" className="w-full">
+          <Tabs value={tab} onValueChange={setTab} className="w-full">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="countries">Countries</TabsTrigger>
@@ -188,7 +194,7 @@ function AdminPage() {
 
             <TabsContent value="overview" className="mt-4 space-y-4">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <TrafficOverTimeChart traffic={metrics.traffic} />
+                {tab === 'overview' ? <TrafficOverTimeChart traffic={metrics.traffic} /> : null}
                 <Card>
                   <CardHeader>
                     <CardTitle>Server</CardTitle>
@@ -210,7 +216,7 @@ function AdminPage() {
             </TabsContent>
 
             <TabsContent value="countries" className="mt-4 space-y-4">
-              <TopCountriesChart traffic={metrics.traffic} />
+              {tab === 'countries' ? <TopCountriesChart traffic={metrics.traffic} /> : null}
               <p className="text-xs text-muted-foreground">
                 Country is best-effort from proxy headers (e.g. Cloudflare/Vercel). Local dev typically shows
                 <span className="font-mono"> XX</span>.
@@ -218,41 +224,43 @@ function AdminPage() {
             </TabsContent>
 
             <TabsContent value="pages" className="mt-4 space-y-4">
-              <TopPagesChart traffic={metrics.traffic} />
+              {tab === 'pages' ? <TopPagesChart traffic={metrics.traffic} /> : null}
             </TabsContent>
 
             <TabsContent value="events" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent activity</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="text-left text-muted-foreground">
-                          <th className="py-2 pr-4">Time</th>
-                          <th className="py-2 pr-4">Type</th>
-                          <th className="py-2">Data</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {metrics.recentEvents.map((e) => (
-                          <tr key={`${e.ts}-${e.type}`} className="border-t">
-                            <td className="py-2 pr-4 whitespace-nowrap">
-                              {new Date(e.ts).toLocaleTimeString()}
-                            </td>
-                            <td className="py-2 pr-4 font-medium whitespace-nowrap">{e.type}</td>
-                            <td className="py-2 font-mono text-xs text-muted-foreground">
-                              {e.data ? JSON.stringify(e.data).slice(0, 200) : ''}
-                            </td>
+              {tab === 'events' ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent activity</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-left text-muted-foreground">
+                            <th className="py-2 pr-4">Time</th>
+                            <th className="py-2 pr-4">Type</th>
+                            <th className="py-2">Data</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
+                        </thead>
+                        <tbody>
+                          {metrics.recentEvents.map((e) => (
+                            <tr key={`${e.ts}-${e.type}`} className="border-t">
+                              <td className="py-2 pr-4 whitespace-nowrap">
+                                {new Date(e.ts).toLocaleTimeString()}
+                              </td>
+                              <td className="py-2 pr-4 font-medium whitespace-nowrap">{e.type}</td>
+                              <td className="py-2 font-mono text-xs text-muted-foreground">
+                                {e.data ? JSON.stringify(e.data).slice(0, 200) : ''}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : null}
             </TabsContent>
           </Tabs>
 

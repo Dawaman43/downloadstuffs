@@ -145,6 +145,7 @@ function RootDocument({ children }: { children: React.ReactNode; }) {
             <body>
 
                 {children}
+                <Analytics />
                 <SpeedInsights />
                 <Analytics />
                 <TanStackDevtools

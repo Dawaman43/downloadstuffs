@@ -1,9 +1,9 @@
-import Result from '@/components/Result'
-import { searchIA } from '@/data/fetchapi'
 import { createFileRoute } from '@tanstack/react-router'
 import * as React from 'react'
 
 import { Card, CardHeader } from '@/components/ui/card'
+import Result from '@/components/Result'
+import { searchIA } from '@/data/fetchapi'
 import { recordPageView, recordSearch } from '@/server/metrics'
 
 const PAGE_SIZE = 10
@@ -17,7 +17,7 @@ const MEDIA_TYPES = [
     'image',
     'data',
     'collection',
-] as const
+] as const satisfies ReadonlyArray<string>
 type MediaTypeFilter = (typeof MEDIA_TYPES)[number]
 
 export const Route = createFileRoute('/result/')({
@@ -96,19 +96,28 @@ export const Route = createFileRoute('/result/')({
             {
                 q,
                 type: deps.type,
-                page: deps.page ?? 1,
+                page: deps.page,
                 rows: PAGE_SIZE,
             },
             request,
         )
 
-        const baseQuery = `(${q})`
+        const phrase = q.replace(/[\\"]/g, '\\$&')
+
+        // More precise title matching: Solr defaults to OR between terms.
+        // Using AND here dramatically reduces irrelevant results (e.g. "mission" alone).
+        const terms: Array<string> = (q.toLowerCase().match(/[a-z0-9]+/g) ?? []).filter(
+            (t: string) => t.length > 0,
+        )
+        const titleAnd = terms.length > 0 ? terms.join(' AND ') : q
+
+        const boosted = `((title:("${phrase}")^14) OR (title:(${titleAnd})^10) OR (subject:("${phrase}")^3) OR (description:("${phrase}")^2) OR (${q}))`
         const query =
             deps.type && deps.type !== 'all'
-                ? `${baseQuery} AND mediatype:${deps.type}`
-                : baseQuery
+                ? `${boosted} AND mediatype:${deps.type}`
+                : boosted
         return await searchIA({
-            data: { query, page: deps.page ?? 1, rows: PAGE_SIZE },
+            data: { query, rerankQuery: q, page: deps.page, rows: PAGE_SIZE },
         })
     }) as any,
     pendingComponent: ResultPending,
