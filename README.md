@@ -1,21 +1,37 @@
 # DownloadStuffs
 
-Fast, modern Internet Archive search + preview + downloads.
+DownloadStuffs is a fast, modern UI for exploring Internet Archive items: search, sort, preview, and reliably download single files or entire playlists.
 
 Live demo: https://downloadstuffss.vercel.app/
 
-> If you find this useful, please ⭐ the repo — it helps more people discover it.
+## Why (YC-style)
 
----
+Internet Archive is a massive public library, but the default experience can be slow to browse on mobile, hard to preview long multi-file items (series/episodes), and annoying to download (CORS, flaky direct downloads, unclear “best file”).
 
-## Highlights
+DownloadStuffs focuses on:
 
-- Real server-side pagination (accurate total pages)
-- Media-type filtering (movies, audio, texts, software, etc.)
-- Beautiful result cards + responsive layout
-- Detail pages with previews (custom video player, audio, images)
-- “Back to results” keeps your query/page/filter
-- Download proxy endpoint (helps avoid CORS issues)
+- Speed: server-side pagination + fast search
+- Clarity: opinionated defaults + clean detail pages
+- Completion: download proxy + playlist downloads + in-page player queue
+
+## What you get
+
+- Search + filters
+	- Media-type filtering (movies, audio, texts, software, etc.)
+	- Sort results by relevance, downloads, recent, views
+	- Real server-side pagination (accurate total pages)
+- Item detail page
+	- Video/audio preview, image gallery
+	- Playlist/episodes view for multi-file items
+	- “All files” browser with search + grouping
+	- Back navigation preserves your query/page/type/sort
+- Downloads
+	- `/api/download` proxy for reliable browser downloads
+	- Playlist ZIP download (`/api/download/playlist`) to batch-download video/audio/playlist files
+- Player UX
+	- Custom player with keyboard shortcuts
+	- Playlist queue + next/prev + auto-advance
+	- Fullscreen + PiP
 
 ## Screenshots
 
@@ -34,7 +50,6 @@ Detail
 Player (fullscreen)
 
 <img src="public/screenshots/player-fullscreen.png" alt="Custom video player fullscreen" width="900" />
-
 
 ## Quickstart
 
@@ -60,9 +75,19 @@ bun run start
 
 ## How it works
 
-- Search uses the Internet Archive Advanced Search API (`advancedsearch.php`) for fast results.
-- Item details use the Internet Archive metadata endpoint (`/metadata/:id`).
-- Downloads are proxied through the app so browsers can download reliably.
+- Search uses the Internet Archive Advanced Search API (`https://archive.org/advancedsearch.php`).
+	- Sorting is passed through to IA via `sort[]`.
+- Item details use IA metadata (`https://archive.org/metadata/:id`).
+- Streaming downloads use IA download URLs (`https://archive.org/download/:id/:file`).
+- The app proxies downloads to avoid browser/CORS issues and support more reliable file downloads.
+
+## Routes (reference)
+
+- `/` — home search
+- `/result?q=...&page=1&type=movies&sort=relevance` — results
+- `/result/:id` — item details
+- `/api/download?id=:id&file=:filename` — download proxy
+- `/api/download/playlist?id=:id&kind=video|audio|playlist|all&source=original|all&max=...` — streaming zip
 
 ## SEO
 
@@ -79,12 +104,15 @@ Optional (controls upstream timeout for downloads):
 
 On Vercel: Project Settings → Environment Variables.
 
-## Routes (reference)
+## FAQ
 
-- `/` — home search
-- `/result?q=...&page=1&type=movies` — results
-- `/result/:id` — item details
-- `/api/download?id=:id&file=:filename` — download proxy
+### Is this affiliated with Internet Archive?
+
+No. This project is community-built and uses public endpoints provided by https://archive.org/.
+
+### Why do some items not play?
+
+Some items don’t have stream-friendly files (or are restricted). In that case, the page still shows metadata and available downloads.
 
 ## Contributing
 
@@ -98,18 +126,8 @@ Contributions are welcome.
 
 - Better structured data (JSON-LD) for richer Google results
 - Improve sitemap coverage (safe, non-crawling strategy)
-- More download formats + batch downloads
+- More download formats + smarter batch downloads
 - Better error UI for upstream timeouts
-
-## FAQ
-
-### Is this affiliated with Internet Archive?
-
-No. This project is community-built and uses public endpoints provided by https://archive.org/.
-
-### Why do some items not play?
-
-Some items don’t have stream-friendly files (or are restricted). In that case, the page will still show metadata and available downloads.
 
 ## License
 
