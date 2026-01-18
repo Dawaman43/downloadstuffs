@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 
+
 function isUnsafePathSegment(value: string) {
    const v = value.trim()
   return (
@@ -18,6 +19,13 @@ function contentDispositionFilename(filename: string) {
   return `attachment; filename*=UTF-8''${encoded}`
 }
 
+function getTimeoutMs() {
+  const raw = process.env.ARCHIVE_UPSTREAM_TIMEOUT_MS
+  const n = raw ? Number(raw) : NaN
+  if (Number.isFinite(n) && n > 0) return Math.floor(n)
+  return 20_000
+}
+
 async function handler({ request }: { request: Request }) {
   const url = new URL(request.url)
   const id = url.searchParams.get('id')?.trim()
@@ -33,9 +41,28 @@ async function handler({ request }: { request: Request }) {
 
   const upstreamUrl = `https://archive.org/download/${encodeURIComponent(id)}/${encodeURIComponent(file)}`
   const range = request.headers.get('range')
-  const upstreamRes = await fetch(upstreamUrl, {
-    headers: range ? { range } : undefined,
-  })
+
+  let upstreamRes: Response
+  try {
+    const controller = new AbortController()
+    const timeoutMs = getTimeoutMs()
+    const timer = setTimeout(() => controller.abort(), timeoutMs)
+    upstreamRes = await fetch(upstreamUrl, {
+      headers: range ? { range } : undefined,
+      signal: controller.signal,
+    })
+    clearTimeout(timer)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    const status = message.toLowerCase().includes('abort') ? 504 : 502
+    return new Response(
+      `Upstream fetch failed (${status}).\n\nURL: ${upstreamUrl}\nError: ${message}`,
+      {
+        status,
+        headers: { 'content-type': 'text/plain; charset=utf-8' },
+      },
+    )
+  }
 
   if (!upstreamRes.ok || !upstreamRes.body) {
     const text = await upstreamRes.text().catch(() => '')
