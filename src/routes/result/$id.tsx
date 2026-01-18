@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import ResultDetails, { ResultDetailsSkeleton } from '@/components/Result/detail'
 import { getArchiveItem } from '@/data/fetchapi'
-import { recordDetailView, recordPageView } from '@/server/metrics'
+import { recordDetailView } from '@/server/metrics'
 
 export const Route = createFileRoute('/result/$id')({
   head: ({ params }) => {
@@ -49,10 +49,9 @@ export const Route = createFileRoute('/result/$id')({
   }),
   loader: (async ({ params, request }: any) => {
     if (request) {
-      recordPageView(request)
-      recordDetailView({ id: params.id }, request)
+      await recordDetailView({ id: params.id }, request)
     } else {
-      recordDetailView({ id: params.id })
+      await recordDetailView({ id: params.id })
     }
     return await getArchiveItem({ data: { id: params.id } })
   }) as any,

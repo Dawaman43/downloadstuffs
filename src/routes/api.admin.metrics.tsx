@@ -7,7 +7,7 @@ import {
 } from '@/server/adminAuth'
 import { getMetricsSnapshot } from '@/server/metrics'
 
-function handler({ request }: { request: Request }) {
+async function handler({ request }: { request: Request }) {
   try {
     requireAdminPasswordConfigured()
   } catch (err) {
@@ -26,7 +26,7 @@ function handler({ request }: { request: Request }) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const snapshot = getMetricsSnapshot()
+  const snapshot = await getMetricsSnapshot()
 
   return new Response(JSON.stringify(snapshot), {
     status: 200,

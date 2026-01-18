@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Card, CardHeader } from '@/components/ui/card'
 import Result from '@/components/Result'
 import { searchIA } from '@/data/fetchapi'
-import { recordPageView, recordSearch } from '@/server/metrics'
+import { recordSearch } from '@/server/metrics'
 
 const PAGE_SIZE = 10
 
@@ -100,11 +100,10 @@ export const Route = createFileRoute('/result/')({
         sort: search.sort,
     })) as any,
     loader: (async ({ deps, request }: any) => {
-        if (request) recordPageView(request, { path: '/result' })
         const q = deps.q.trim()
         if (!q) return { docs: [], total: 0 }
 
-        recordSearch(
+        await recordSearch(
             {
                 q,
                 type: deps.type,

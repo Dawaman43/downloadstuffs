@@ -1,7 +1,8 @@
+import { Readable } from 'node:stream'
+
 import { createFileRoute } from '@tanstack/react-router'
 
 import archiver from 'archiver'
-import { Readable } from 'node:stream'
 
 import { recordDownload, recordDownloadError } from '@/server/metrics'
 
@@ -87,7 +88,7 @@ async function handler({ request }: { request: Request }) {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     const status = message.toLowerCase().includes('abort') ? 504 : 502
-    recordDownloadError({ id, file: 'playlist.zip', status, message }, request)
+    await recordDownloadError({ id, file: 'playlist.zip', status, message }, request)
     return new Response(`Upstream metadata fetch failed (${status}).\n\nURL: ${metaUrl}\nError: ${message}`, {
       status,
       headers: { 'content-type': 'text/plain; charset=utf-8' },
@@ -96,7 +97,7 @@ async function handler({ request }: { request: Request }) {
 
   if (!metaRes.ok) {
     const text = await metaRes.text().catch(() => '')
-    recordDownloadError({ id, file: 'playlist.zip', status: metaRes.status }, request)
+    await recordDownloadError({ id, file: 'playlist.zip', status: metaRes.status }, request)
     return new Response(text || metaRes.statusText, {
       status: metaRes.status,
       headers: {
@@ -193,7 +194,7 @@ async function handler({ request }: { request: Request }) {
     'content-disposition': contentDispositionFilename(zipName),
   })
 
-  recordDownload({ id, file: zipName, count: selected.length }, request)
+  await recordDownload({ id, file: zipName, count: selected.length }, request)
 
   return new Response(Readable.toWeb(archive) as unknown as ReadableStream, {
     status: 200,

@@ -208,6 +208,12 @@ function AdminPage() {
             <MetricCard label="Errors" value={fmt.format(metrics.counters.downloadErrors)} />
           </div>
 
+          <p className="text-xs text-muted-foreground">
+            Note: these stats are in-memory and reset on server restart/cold start. On serverless
+            platforms, different requests may hit different instances, so counts can look low or
+            temporarily zero.
+          </p>
+
           <Tabs value={tab} onValueChange={setTab} className="w-full">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>

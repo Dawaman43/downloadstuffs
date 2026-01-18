@@ -140,10 +140,12 @@ export function verifySessionToken(token: string) {
     decipher.setAAD(Buffer.from(COOKIE_NAME, 'utf8'))
     decipher.setAuthTag(tag)
     const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()])
-    const payload = JSON.parse(plaintext.toString('utf8')) as SessionPayload
-    if (!payload || typeof payload.exp !== 'number') return null
+    const parsed = JSON.parse(plaintext.toString('utf8')) as unknown
+    if (typeof parsed !== 'object' || parsed === null) return null
+    const payload = parsed as Partial<SessionPayload>
+    if (typeof payload.exp !== 'number') return null
     if (Date.now() > payload.exp) return null
-    return payload
+    return payload as SessionPayload
   } catch {
     return null
   }

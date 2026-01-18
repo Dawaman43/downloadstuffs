@@ -8,8 +8,6 @@ import { TanStackDevtools } from '@tanstack/react-devtools';
 
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-
-
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 
 import appCss from '../styles.css?url';
@@ -18,6 +16,8 @@ import type { QueryClient } from '@tanstack/react-query';
 
 import type { TRPCRouter } from '@/integrations/trpc/router';
 import type { TRPCOptionsProxy } from '@trpc/tanstack-react-query';
+
+import { recordPageView } from '@/server/metrics'
 
 interface MyRouterContext {
     queryClient: QueryClient;
@@ -116,6 +116,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
     shellComponent: RootDocument,
     errorComponent: RootError,
+    loader: async ({ request }) => {
+        if (request) await recordPageView(request)
+        return null
+    },
 });
 
 function RootError({ error }: { error: unknown }) {
