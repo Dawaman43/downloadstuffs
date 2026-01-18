@@ -5,11 +5,25 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
+    CardContent,
     CardFooter,
 } from '../ui/card'
 import { Button } from '../ui/button'
 import { Link } from '@tanstack/react-router'
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
+import { 
+    Calendar, 
+    Download, 
+    FileText, 
+    Film, 
+    Headphones, 
+    ImageIcon, 
+    Layers, 
+    Monitor, 
+    Database, 
+    SearchX,
+    ArrowLeft,
+} from 'lucide-react'
 
 function stripHtml(input: string) {
     return input.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
@@ -18,6 +32,21 @@ function stripHtml(input: string) {
 function asArray(value?: string | string[]) {
     if (!value) return []
     return Array.isArray(value) ? value : [value]
+}
+
+function formatNumber(num: number) {
+    return new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(num)
+}
+
+function getIconForMediaType(type: string) {
+    const t = type.toLowerCase()
+    if (t.includes('audio')) return <Headphones className="w-3 h-3" />
+    if (t.includes('movie')) return <Film className="w-3 h-3" />
+    if (t.includes('image')) return <ImageIcon className="w-3 h-3" />
+    if (t.includes('software')) return <Monitor className="w-3 h-3" />
+    if (t.includes('data')) return <Database className="w-3 h-3" />
+    if (t.includes('collection')) return <Layers className="w-3 h-3" />
+    return <FileText className="w-3 h-3" />
 }
 
 type ResultProps = {
@@ -74,13 +103,12 @@ export default function Result({
                 typeof item?.identifier === 'string' && item.identifier.length > 0
         )
 
-        // Safety net: even if the server returns mixed docs,
-        // the UI stays consistent with the selected filter.
         if (mediaType === 'all') return withIds
         return withIds.filter(
             (item) => String(item.mediatype).toLowerCase() === mediaType
         )
     }, [data, mediaType])
+
     const isServerPagination = typeof totalItemsProp === 'number'
     const totalItems = isServerPagination ? totalItemsProp : items.length
     const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
@@ -113,7 +141,7 @@ export default function Result({
     }, [pageItems.length, pageSize, safePage, totalItems])
 
     const pageNumbers = React.useMemo(() => {
-        const windowSize = 5
+        const windowSize = 3 
         let start = Math.max(1, safePage - Math.floor(windowSize / 2))
         let end = Math.min(totalPages, start + windowSize - 1)
         start = Math.max(1, end - windowSize + 1)
@@ -123,157 +151,189 @@ export default function Result({
     }, [safePage, totalPages])
 
     const pagination = totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
-            <p className="text-sm text-muted-foreground text-center sm:text-left">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 w-full">
+            <span className="text-sm text-muted-foreground order-2 sm:order-1">
                 {rangeLabel}
-            </p>
-            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
+            </span>
+            <div className="flex items-center gap-2 order-1 sm:order-2">
                 <Button
                     variant="outline"
-                    size="sm"
+                    size="icon"
+                    className="h-8 w-8"
                     disabled={safePage <= 1}
                     onClick={() => requestPage(safePage - 1)}
                 >
-                    Previous
+                    <span className="sr-only">Previous</span>
+                    &lsaquo;
                 </Button>
 
-                {pageNumbers.map((p) => (
-                    <Button
-                        key={p}
-                        variant={p === safePage ? 'default' : 'outline'}
-                        size="sm"
-                        aria-current={p === safePage ? 'page' : undefined}
-                        onClick={() => requestPage(p)}
-                    >
-                        {p}
-                    </Button>
-                ))}
+                <div className="flex items-center gap-1">
+                    {pageNumbers[0] > 1 && (
+                         <span className="text-muted-foreground text-xs px-1">...</span>
+                    )}
+                    {pageNumbers.map((p) => (
+                        <Button
+                            key={p}
+                            variant={p === safePage ? 'default' : 'ghost'}
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => requestPage(p)}
+                        >
+                            {p}
+                        </Button>
+                    ))}
+                     {pageNumbers[pageNumbers.length - 1] < totalPages && (
+                        <span className="text-muted-foreground text-xs px-1">...</span>
+                    )}
+                </div>
 
                 <Button
                     variant="outline"
-                    size="sm"
+                    size="icon"
+                    className="h-8 w-8"
                     disabled={safePage >= totalPages}
                     onClick={() => requestPage(safePage + 1)}
                 >
-                    Next
+                    <span className="sr-only">Next</span>
+                    &rsaquo;
                 </Button>
             </div>
         </div>
     )
 
     return (
-        <div className="w-full max-w-5xl flex flex-col gap-6 py-8">
-            <h1 className="font-clash text-4xl font-semibold text-center">
-                Search Results
-            </h1>
-
-            <div className="flex flex-col items-center gap-3">
-                {/* Mobile: use a dropdown so it doesn't overflow */}
-                <div className="w-full max-w-xs sm:hidden">
-                    <select
-                        value={mediaType}
-                        onChange={(e) =>
-                            onMediaTypeChange?.(e.currentTarget.value as MediaTypeFilter)
-                        }
-                        className="w-full h-10 rounded-md border bg-background px-3 text-sm"
-                        aria-label="Filter by type"
-                    >
-                        {MEDIA_TYPES.map((t) => (
-                            <option key={t} value={t}>
-                                {MEDIA_TYPE_LABELS[t]}
-                            </option>
-                        ))}
-                    </select>
+        <div className="container mx-auto max-w-7xl px-4 md:px-6 py-8 space-y-8">
+            <div className="space-y-4 text-center sm:text-left">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <Button asChild variant="ghost" size="icon" className="h-9 w-9">
+                        <Link to="/" aria-label="Back to home">
+                            <ArrowLeft className="h-5 w-5" />
+                        </Link>
+                    </Button>
+                    <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                        Search Results
+                    </h1>
                 </div>
-
-                {/* Desktop/tablet: tabs */}
-                <div className="hidden sm:block w-full max-w-xl">
-                    <Tabs
-                        value={mediaType}
-                        onValueChange={(v) => {
-                            const next = (MEDIA_TYPES as readonly string[]).includes(v)
-                                ? (v as MediaTypeFilter)
-                                : 'all'
-                            onMediaTypeChange?.(next)
-                        }}
-                    >
-                        <TabsList className="w-full overflow-x-auto flex-nowrap">
+                
+                <Tabs
+                    value={mediaType}
+                    onValueChange={(v) => {
+                        const next = (MEDIA_TYPES as readonly string[]).includes(v)
+                            ? (v as MediaTypeFilter)
+                            : 'all'
+                        onMediaTypeChange?.(next)
+                    }}
+                    className="w-full"
+                >
+                    <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+                        <TabsList className="h-auto w-auto inline-flex justify-start p-1 bg-muted/50">
                             {MEDIA_TYPES.map((t) => (
-                                <TabsTrigger key={t} value={t} className="flex-1">
+                                <TabsTrigger 
+                                    key={t} 
+                                    value={t} 
+                                    className="rounded-sm px-4 py-2 text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                                >
                                     {MEDIA_TYPE_LABELS[t]}
                                 </TabsTrigger>
                             ))}
                         </TabsList>
-                    </Tabs>
+                    </div>
+                </Tabs>
+            </div>
+
+            {totalItems === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 border rounded-xl border-dashed bg-muted/30">
+                    <div className="p-4 rounded-full bg-muted">
+                        <SearchX className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-medium">No results found</h3>
+                        <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                            We couldn't find any items matching your criteria. Try adjusting your filters or search terms.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {pageItems.map((item) => {
+                            if (!item?.identifier) return null
+                            return (
+                                <Link 
+                                    key={item.identifier}
+                                    to="/result/$id" 
+                                    params={{ id: item.identifier }}
+                                    className="group block h-full outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xl"
+                                >
+                                    <Card className="h-full flex flex-col overflow-hidden border-border/50 hover:border-border hover:shadow-md transition-all duration-300">
+                                        <div className="relative aspect-16/10 bg-muted overflow-hidden">
+                                            <img
+                                                src={`https://archive.org/services/img/${item.identifier}`}
+                                                alt=""
+                                                loading="lazy"
+                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none'
+                                                    e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                                                }}
+                                            />
+                                            <div className="absolute inset-0 items-center justify-center text-muted-foreground/20 hidden">
+                                                <ImageIcon className="w-12 h-12" />
+                                            </div>
+                                            
+                                            <div className="absolute top-2 right-2">
+                                                <div className="flex items-center gap-1.5 bg-black/70 backdrop-blur-sm text-white text-[10px] uppercase font-bold px-2 py-1 rounded-full">
+                                                    {getIconForMediaType(String(item.mediatype))}
+                                                    <span>{item.mediatype}</span>
+                                                </div>
+                                            </div>
+                                        </div>
 
-            {totalItems === 0 && (
-                <p className="text-center text-muted-foreground">
-                    No results found. Try another search
-                </p>
+                                        <CardHeader className="p-4 pb-2 space-y-1">
+                                            <CardTitle className="text-base font-semibold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+                                                {item.title}
+                                            </CardTitle>
+                                            <CardDescription className="text-xs line-clamp-1">
+                                                by {item.creator || "Unknown"}
+                                            </CardDescription>
+                                        </CardHeader>
+
+                                        <CardContent className="p-4 pt-0 grow">
+                                            {item.description && (
+                                                <p className="text-xs text-muted-foreground line-clamp-3 mb-3">
+                                                    {stripHtml(item.description)}
+                                                </p>
+                                            )}
+                                            
+                                            <div className="flex flex-wrap gap-2 mt-auto">
+                                                {asArray(item.subject).slice(0, 2).map((sub, i) => (
+                                                    <span key={i} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-secondary text-secondary-foreground">
+                                                        {sub}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </CardContent>
+
+                                        <CardFooter className="p-4 pt-0 border-t bg-muted/20 mt-auto flex items-center justify-between text-xs text-muted-foreground">
+                                            <div className="flex items-center gap-1">
+                                                <Calendar className="w-3 h-3" />
+                                                <span>{item.year || item.date?.toString().substring(0, 4) || 'N/A'}</span>
+                                            </div>
+                                            {typeof item.downloads === "number" && (
+                                                <div className="flex items-center gap-1">
+                                                    <Download className="w-3 h-3" />
+                                                    <span>{formatNumber(item.downloads)}</span>
+                                                </div>
+                                            )}
+                                        </CardFooter>
+                                    </Card>
+                                </Link>
+                            )
+                        })}
+                    </div>
+                    {pagination}
+                </div>
             )}
-
-            {pagination}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pageItems.map((item) =>
-                    item?.identifier ? (
-                        <Card
-                            key={item.identifier}
-                            className="flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer"
-                        >
-                        <div className="w-full overflow-hidden rounded-t-xl bg-muted">
-                            <img
-                                src={`https://archive.org/services/img/${item.identifier}`}
-                                alt={item.title}
-                                loading="lazy"
-                                className="h-44 w-full object-cover"
-                                onError={(e) => {
-                                    ;(e.currentTarget as HTMLImageElement).style.display = 'none'
-                                }}
-                            />
-                        </div>
-                        <CardHeader className="space-y-2">
-                            <CardTitle className="text-base line-clamp-2">{item.title}</CardTitle>
-
-                            <CardDescription className="text-sm opacity-75">
-                                {item.creator || "Unknown Author"}
-                            </CardDescription>
-
-                            <div className="text-xs text-muted-foreground flex flex-wrap gap-x-2 gap-y-1">
-                                <span>{item.mediatype}</span>
-                                {item.year != null && <span>• {String(item.year)}</span>}
-                                {!item.year && item.date && <span>• {item.date}</span>}
-                                {typeof item.downloads === "number" && <span>• {item.downloads} downloads</span>}
-                            </div>
-
-                            {item.description && (
-                                <p className="text-sm text-muted-foreground line-clamp-3">
-                                    {stripHtml(item.description)}
-                                </p>
-                            )}
-
-                            {asArray(item.subject).length > 0 && (
-                                <p className="text-xs text-muted-foreground line-clamp-2">
-                                    {asArray(item.subject).slice(0, 3).join(" · ")}
-                                </p>
-                            )}
-                        </CardHeader>
-
-                        <CardFooter className="pt-0">
-                            <Link to="/result/$id" params={{ id: item.identifier }}>
-                                <Button variant="secondary" className="w-full text-center">
-                                    See Details
-                                </Button>
-                            </Link>
-                        </CardFooter>
-                    </Card>
-                    ) : null
-                )}
-            </div>
-
-            {pagination}
         </div>
     )
 }

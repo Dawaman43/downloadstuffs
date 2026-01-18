@@ -1,9 +1,10 @@
-import { useParams } from "@tanstack/react-router";
+import { Link, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { getArchiveItem } from "@/data/fetchapi";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 
 function stripHtml(input: string) {
     return input.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -120,6 +121,15 @@ export default function ResultDetails() {
 
     return (
         <div className="max-w-3xl mx-auto py-10 space-y-6">
+            <div className="flex items-center gap-2">
+                <Button asChild variant="ghost" size="icon" className="h-9 w-9">
+                    <Link to="/" aria-label="Back to home">
+                        <ArrowLeft className="h-5 w-5" />
+                    </Link>
+                </Button>
+                <span className="text-sm text-muted-foreground">Back</span>
+            </div>
+
             <Card>
                 <CardHeader>
                     <CardTitle className="text-2xl">{metadata.title}</CardTitle>
