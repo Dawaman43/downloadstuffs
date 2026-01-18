@@ -145,7 +145,7 @@ export interface FileRoutesByFullPath {
   '/demo/trpc-todo': typeof DemoTrpcTodoRoute
   '/result/$id': typeof ResultIdRoute
   '/sitemap/xml': typeof SitemapXmlRoute
-  '/result': typeof ResultIndexRoute
+  '/result/': typeof ResultIndexRoute
   '/api/admin/login': typeof ApiAdminLoginRoute
   '/api/admin/logout': typeof ApiAdminLogoutRoute
   '/api/admin/metrics': typeof ApiAdminMetricsRoute
@@ -158,7 +158,7 @@ export interface FileRoutesByFullPath {
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
-  '/demo/start/ssr': typeof DemoStartSsrIndexRoute
+  '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -217,7 +217,7 @@ export interface FileRouteTypes {
     | '/demo/trpc-todo'
     | '/result/$id'
     | '/sitemap/xml'
-    | '/result'
+    | '/result/'
     | '/api/admin/login'
     | '/api/admin/logout'
     | '/api/admin/metrics'
@@ -230,7 +230,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
-    | '/demo/start/ssr'
+    | '/demo/start/ssr/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -322,7 +322,7 @@ declare module '@tanstack/react-router' {
     '/result/': {
       id: '/result/'
       path: '/result'
-      fullPath: '/result'
+      fullPath: '/result/'
       preLoaderRoute: typeof ResultIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -427,7 +427,7 @@ declare module '@tanstack/react-router' {
     '/demo/start/ssr/': {
       id: '/demo/start/ssr/'
       path: '/demo/start/ssr'
-      fullPath: '/demo/start/ssr'
+      fullPath: '/demo/start/ssr/'
       preLoaderRoute: typeof DemoStartSsrIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
