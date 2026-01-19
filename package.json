@@ -1,5 +1,22 @@
 {
   "name": "downloadstuffs",
+  "description": "Fast, modern UI for exploring Internet Archive items: search, preview, and download single files or playlists.",
+  "homepage": "https://downloadstuffss.vercel.app/",
+  "license": "MIT",
+  "keywords": [
+    "internet-archive",
+    "archive-org",
+    "tanstack",
+    "tanstack-router",
+    "tanstack-start",
+    "react",
+    "vite",
+    "trpc",
+    "tailwindcss",
+    "downloader",
+    "playlist",
+    "video-player"
+  ],
   "private": true,
   "type": "module",
   "scripts": {

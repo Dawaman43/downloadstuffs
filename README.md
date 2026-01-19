@@ -1,6 +1,9 @@
 # DownloadStuffs
 
-DownloadStuffs is a fast, modern UI for exploring Internet Archive items: search, sort, preview, and reliably download single files or entire playlists.
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Live demo](https://img.shields.io/badge/demo-online-brightgreen.svg)](https://downloadstuffss.vercel.app/)
+
+Fast, modern UI for exploring Internet Archive items: search, sort, preview, and reliably download single files or entire playlists.
 
 Live demo: https://downloadstuffss.vercel.app/
 
@@ -55,18 +58,33 @@ Player (fullscreen)
 
 ### Requirements
 
-- Bun (recommended)
+- Node.js 20+
+- Package manager: `pnpm` (recommended; lockfile included) or `bun`
 
 ### Run locally
 
 ```bash
+pnpm install
+pnpm dev
+```
+
+Or with Bun:
+
+```bash
 bun install
-bun run dev
+bun dev
 ```
 
 Dev server: http://localhost:3000
 
 ### Build & run (production)
+
+```bash
+pnpm build
+pnpm start
+```
+
+Or with Bun:
 
 ```bash
 bun run build
