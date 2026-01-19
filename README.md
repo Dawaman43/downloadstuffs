@@ -4,7 +4,7 @@ DownloadStuffs is a fast, modern UI for exploring Internet Archive items: search
 
 Live demo: https://downloadstuffss.vercel.app/
 
-## Why (YC-style)
+## Why 
 
 Internet Archive is a massive public library, but the default experience can be slow to browse on mobile, hard to preview long multi-file items (series/episodes), and annoying to download (CORS, flaky direct downloads, unclear “best file”).
 
